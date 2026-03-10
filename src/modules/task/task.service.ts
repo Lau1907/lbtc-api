@@ -1,56 +1,80 @@
-import { Injectable } from "@nestjs/common";
-import { CreateTaskDto } from "./create-task-dto";
+import { Inject, Injectable } from "@nestjs/common";
+import { Client } from "pg";
+import { PrismaService } from "src/prisma.service";
+import { CreateTaskDto } from "../auth/dto/create-task-dto";
+import { UpdateTaskDto } from "../auth/dto/update-task-dto";
+import { Task } from "../auth/entities/task.entity";
 
 @Injectable()
 export class TaskService {
 
-    private tasks: any[] = []
+    constructor(
+        @Inject('DATABASE_CONNECTION') private db: Client, 
+        private prisma: PrismaService
+    ) {}
+    private tasks: any[] = [];
 
-    public getTasks (){
-        return this.tasks;
-    }
-    
-    public getTaskById(id: number):string{
-        var task = this.tasks.find((data) => data.id == id)
-        return task;
-    }
-    public insertTask(task: CreateTaskDto): any {
-        var id = this.tasks.length + 1;
-        var position = this.tasks.push({
-            ...task,
-            id
-        });
-        //task.id = id
-        return this.tasks[position - 1];
+    public async getTasks(): Promise<Task[]> {
+        const tasks = await this.prisma.task.findMany();
+        return tasks;
     }
 
-    public updateTask(id: number, task: any): any {
-        const taskUpdate = this.tasks.map( (data) => {
-            console.error("id", id);
-            console.error("data", data);
-            if (data.id == id){
+    public async getTaskById(id: number): Promise<Task> {
+    const task = await this.prisma.task.findUnique({
+        where: { id }
+    });
 
-            console.error("task", task);
-            console.error("STORE", data);
-
-                if (task.name) data.name = task.name;
-                if (task.description) data.description = task.description;
-                if (task.priority != null) data.priority = task.priority;
-
-            console.error("task", task.priority);
-            console.error("STORE", data);
-                return data
-            }
-            return data
-        })
-        return taskUpdate;
+    if (!task) {
+        throw new Error(`Task with id ${id} not found`);
     }
 
-    public deleteTask(id: number): string {
-        const array = this.tasks.filter( data => data.id);
-        this.tasks = array;
+    return task;
+}
 
-        return `Task Delete`;
+    // ➕ Insertar tarea
+    public async insertTask(task: CreateTaskDto): Promise<Task> {
+        const query = `
+            INSERT INTO tasks (name, description, priority, user_id)
+            VALUES ('${task.name}', '${task.description}', ${task.priority}, ${task.user_id})
+            RETURNING *
+        `;
+
+        const result = await this.db.query(query);
+        return result.rows[0];
     }
 
+    public async updateTask(
+        id: number,
+        taskUpdated: UpdateTaskDto
+    ): Promise<Task> {
+
+        const task = await this.getTaskById(id);
+
+        task.name = taskUpdated.name ?? task.name;
+        task.description = taskUpdated.description ?? task.description;
+        task.priority = taskUpdated.priority ?? task.priority;
+
+        const query = `
+            UPDATE tasks
+            SET 
+                name = '${task.name}',
+                description = '${task.description}',
+                priority = ${task.priority}
+            WHERE id = ${id}
+            RETURNING *
+        `;
+
+        const result = await this.db.query(query);
+        return result.rows[0];
+    }
+
+    // 🗑️ Eliminar tarea
+    public async deleteTask(id: number): Promise<boolean> {
+    await this.getTaskById(id);
+
+    const sql = `DELETE FROM tasks WHERE id = ${id}`;
+    const result = await this.db.query(sql);
+
+    return result.rows.length > 0;
+}
 }

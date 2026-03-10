@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsNotEmpty, IsString } from "class-validator";
 
 
 export class CreateTaskDto {
@@ -13,4 +13,7 @@ export class CreateTaskDto {
     @IsBoolean()
     @IsNotEmpty()
     priority: Boolean;
+
+    @IsInt({ message: 'Debe ser un número entero' })
+    user_id: number;
 }
