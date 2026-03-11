@@ -7,7 +7,7 @@ export class AuthService {
 
     constructor(private readonly prisma:PrismaService){ }
 
-    public async getUserByUsername(): Promise<User | null>{
+    public async getUserByUsername(username: AuthDto): Promise<User | null>{
         return await this.prisma.user.findFirst({
             where: { username }
         });
