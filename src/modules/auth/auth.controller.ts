@@ -1,37 +1,44 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UnauthorizedException } from "@nestjs/common";
-import { ApiOperation } from "@nestjs/swagger";
-import { AuthService } from "./auth.service";
+import {
+    Body,
+    Controller,
+    Get,
+    Headers,
+    Post,
+    UseGuards
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
-@Controller("api/auth")
-export class AuthController{
-    utilSvc: any;
-    constructor(private  readonly authSvc: AuthService){}
+@Controller('api/auth')
+export class AuthController {
 
-    @Post("login")
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation( {summary: 'Extrae el Id del usuario desde el token y busca la informacion'})
-    public async login(@Body() auth): Promise<any> {
-        const { username, password } = auth;
+  constructor(private readonly authSvc: AuthService) {}
 
-        const user = await this.authSvc.getUserByUsername(username);
+  @Post('login')
+async login(@Body() body: any) {
+  const { username, password } = body;
+  return this.authSvc.login(username, password);
+}
 
-        if(!user)
-            throw new UnauthorizedException('El usuario y/o contrseña son incorrectas');
-        if(await this.utilSvc.checkPassword(password, user.password!)){
-            const { password,...payload} = user;
+  @Post('refresh')
+  async refresh(@Headers('authorization') authHeader: string) {
+    const token = authHeader?.replace('Bearer ', '');
+    return this.authSvc.refreshToken(token);
+  }
 
-            const jwt = await this.utilSvc.generateJWT(payload);
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getProfile(@Headers() headers) {
+    return {
+      message: 'Ruta protegida',
+      user: headers.user
+    };
+  }
 
-
-            return { access_token: jwt, refresh_token: ''};
-        }else{
-            throw new UnauthorizedException('El usuario y/o contrseña son incorrectas')
-        }
-    }
-
-    @Get("me")
-    public async getProfile(){
-
-    }
-
+  @Post('logout')
+  logout() {
+    return {
+      message: 'Logout exitoso (manejado en frontend)'
+    };
+  }
 }
