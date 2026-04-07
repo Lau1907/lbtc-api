@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { TaskService } from "./task.service";
 import { ApiOperation } from "@nestjs/swagger";
-@Controller("api/task")
+import { TaskService } from "./task.service";
+@Controller("/api/task")
 export class TaskController{
 
     constructor(private  readonly taskSvc: TaskService){}

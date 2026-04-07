@@ -12,12 +12,14 @@ import {
     Put
 } from "@nestjs/common";
 
+import { UtilService } from "src/common/services/util.service";
+import { CreateUserDto } from "../auth/dto/create-user-dto";
 import { UserService } from "./user.service";
 
 @Controller("api/user")
 export class UserController {
 
-    constructor(private readonly userSvc: UserService) {}
+    constructor(private readonly userSvc: UserService, private readonly utilSvc: UtilService) {}
 
     @Get()
     public async getUsers(): Promise<any> {
@@ -37,9 +39,18 @@ export class UserController {
     }
 
     @Post()
-    public async insertUser(@Body() user: any): Promise<any> {
-        return await this.userSvc.insertUser(user);
+    public async insertUser(@Body() user: CreateUserDto): Promise<any> {
+        const encryptedPassword = await this.utilSvc.hashPassword(user.password);
+    user.password = encryptedPassword;
+    const result = await this.userSvc.insertUser(user);
+    if (result == undefined || result == null) {
+      throw new HttpException(
+        `Error al insertar el usuario`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
+    return result;
+  }
 
     @Put(":id")
     public updateUser(

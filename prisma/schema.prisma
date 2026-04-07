@@ -8,13 +8,16 @@ datasource db {
 
 
 model User {
-    id Int @default(autoincrement()) @id
-    name String @db.VarChar(250)
-    lastname String @db.VarChar(250)
-    username String @db.VarChar(100)
-    password String
-    created_at DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  name       String
+  lastname   String
+  username   String   @unique
+  password   String
+  hash       String?  // 👈 agrega esto
+  created_at DateTime @default(now())
     tasks Task[]
+
+    logs Logs[]
 }
 
 model Task {
@@ -24,4 +27,16 @@ model Task {
   priority Boolean
   user_id Int
   user User @relation(fields: [user_id], references: [id])
+}
+
+model Logs{
+  id Int @id @default(autoincrement())
+  statusCode Int
+  timeStamp DateTime
+  path String @db.Text
+  error String @db.Text
+  errorcode String @db.Text
+  session_id Int?
+  
+  user User? @relation(fields: [session_id], references: [id])
 }

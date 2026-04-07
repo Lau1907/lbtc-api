@@ -3,14 +3,14 @@ import { IsString } from "class-validator";
 export class CreateUserDto {
 
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  lastname: string; // 👈 AGREGA ESTO
+  lastname!: string; // 👈 AGREGA ESTO
 
   @IsString()
-  username: string;
+  username!: string;
 
   @IsString()
-  password: string;
+  password!: string;
 }

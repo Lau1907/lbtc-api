@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
 import { Client } from "pg";
+import { PrismaService } from "src/common/services/prisma.service";
 import { CreateUserDto } from "src/modules/auth/dto/create-user-dto";
 import { UpdateUserDto } from "src/modules/auth/dto/update-user-dto";
 import { User } from "src/modules/auth/entities/user.entity";
-import { PrismaService } from "src/prisma.service";
 
 @Injectable()
 export class UserService {
@@ -107,3 +107,6 @@ export class UserService {
         return result.rowCount > 0;
     }
 }
+
+//correccion del refresh 
+//logout
