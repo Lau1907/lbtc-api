@@ -1,0 +1,62 @@
+<div class="dashboard">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <span>⚡</span>
+      <h2>LBTC</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a [routerLink]="['/dashboard']" class="nav-item">📊 Dashboard</a>
+      <a [routerLink]="['/tasks']" class="nav-item">✅ Tareas</a>
+      <a [routerLink]="['/users']" class="nav-item active">👥 Usuarios</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1>Usuarios 👥</h1>
+      <p>Gestiona los usuarios del sistema</p>
+      <button class="btn-add" (click)="showForm = !showForm">+ Nuevo usuario</button>
+    </div>
+
+    <!-- Formulario nuevo usuario -->
+    <div class="task-form card-form" *ngIf="showForm">
+      <input class="form-input" [(ngModel)]="newUser.name" placeholder="Nombre" />
+      <input class="form-input" [(ngModel)]="newUser.lastname" placeholder="Apellido" />
+      <input class="form-input" [(ngModel)]="newUser.username" placeholder="Usuario" />
+      <input class="form-input" type="password" [(ngModel)]="newUser.password" placeholder="Contraseña" />
+      <button class="btn-save" (click)="createUser()">💾 Guardar</button>
+      <button class="btn-cancel" (click)="showForm = false">✕ Cancelar</button>
+    </div>
+
+    <!-- Lista usuarios -->
+    <div class="task-list">
+      <div class="task-card" *ngFor="let user of users">
+
+        <!-- Modo edición -->
+        <div *ngIf="editingUser?.id === user.id" class="edit-mode">
+          <input class="form-input" [(ngModel)]="editingUser.name" placeholder="Nombre" />
+          <input class="form-input" [(ngModel)]="editingUser.lastname" placeholder="Apellido" />
+          <input class="form-input" [(ngModel)]="editingUser.username" placeholder="Usuario" />
+          <input class="form-input" type="password" [(ngModel)]="editingUser.password" placeholder="Nueva contraseña" />
+          <div class="edit-actions">
+            <button class="btn-save" (click)="saveEdit()">💾 Guardar</button>
+            <button class="btn-cancel" (click)="cancelEdit()">✕ Cancelar</button>
+          </div>
+        </div>
+
+        <!-- Modo vista -->
+        <div *ngIf="editingUser?.id !== user.id" class="view-mode">
+          <div class="task-info">
+            <h4>{{ user.name }} {{ user.lastname }}</h4>
+            <p>@{{ user.username }}</p>
+          </div>
+          <div class="task-actions">
+            <button class="btn-edit" (click)="startEdit(user)">✏️</button>
+            <button class="btn-delete" (click)="deleteUser(user.id)">🗑️</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

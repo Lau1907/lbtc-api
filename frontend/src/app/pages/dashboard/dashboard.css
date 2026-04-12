@@ -1,0 +1,130 @@
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #0f0f0f;
+}
+
+.sidebar {
+  width: 240px;
+  background: rgba(255,255,255,0.03);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.sidebar-logo span { font-size: 24px; }
+
+.sidebar-logo h2 {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin: 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.nav-item {
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.nav-item:hover, .nav-item.active {
+  background: rgba(108,99,255,0.15);
+  color: #6c63ff;
+}
+
+.btn-logout {
+  padding: 12px 16px;
+  background: rgba(255,80,80,0.1);
+  border: 1px solid rgba(255,80,80,0.2);
+  border-radius: 10px;
+  color: #ff6b6b;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: left;
+}
+
+.btn-logout:hover {
+  background: rgba(255,80,80,0.2);
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.header p {
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 28px;
+  transition: transform 0.3s;
+}
+
+.card:hover { transform: translateY(-4px); }
+
+.card-icon { font-size: 32px; margin-bottom: 16px; }
+
+.card h3 {
+  color: #fff;
+  font-size: 18px;
+  margin: 0 0 8px 0;
+}
+
+.card p {
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+  margin: 0 0 20px 0;
+}
+
+.card-btn {
+  display: inline-block;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #6c63ff, #3b82f6);
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
