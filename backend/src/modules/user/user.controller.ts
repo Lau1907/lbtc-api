@@ -72,20 +72,32 @@ export class UserController {
   }
 
     @Put(":id")
-    @UseGuards(AuthGuard)
-    public updateUser(
-        @Param("id", ParseIntPipe) id: number,
-        @Body() user: any,
-        @Req() req: any
-    ): any {
-        const currentUserId = req['user'].sub;
-        const isAdmin = req['user'].role === 'admin';
+@UseGuards(AuthGuard)
+public async updateUser(
+  @Param("id", ParseIntPipe) id: number,
+  @Body() user: any,
+  @Req() req: any
+): Promise<any> {
+  const currentUserId = req['user'].sub;
+  const isAdmin = req['user'].role === 'admin';
 
-        // Si no es admin, solo puede editar su propio perfil
-        if (!isAdmin && currentUserId !== id) {
-            throw new ForbiddenException('No puedes editar el perfil de otro usuario');
-        }    
-        return this.userSvc.updateUser(id, user);
-    }
+  if (!isAdmin && currentUserId !== id) {
+    throw new ForbiddenException('No puedes editar el perfil de otro usuario');
+  }
+
+  const result = await this.userSvc.updateUser(id, user);
+
+  //Log de cambio de rol
+  if (user.role) {
+    await this.userSvc.saveLog(
+      200,
+      '/api/user',
+      `Cambio de rol: usuario ${id} cambió a ${user.role} por usuario ${currentUserId}`,
+      'ROLE_CHANGED'
+    );
+  }
+
+  return result;
+}
 
 }

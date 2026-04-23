@@ -9,5 +9,5 @@ export declare class UserController {
     deleteUser(id: number): Promise<boolean>;
     getUserById(id: number): Promise<any>;
     insertUser(user: CreateUserDto): Promise<any>;
-    updateUser(id: number, user: any, req: any): any;
+    updateUser(id: number, user: any, req: any): Promise<any>;
 }

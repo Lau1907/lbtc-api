@@ -135,6 +135,17 @@ let UserService = class UserService {
         const result = await this.db.query(sql, [id]);
         return (result.rowCount ?? 0) > 0;
     }
+    async saveLog(statusCode, path, error, errorcode) {
+        await this.prisma.logs.create({
+            data: {
+                statusCode,
+                timeStamp: new Date(),
+                path,
+                error,
+                errorcode
+            }
+        }).catch(err => console.error('Error al guardar log:', err));
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

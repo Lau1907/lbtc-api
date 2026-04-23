@@ -13,4 +13,5 @@ export declare class UserService {
     insertUser(user: CreateUserDto): Promise<User>;
     updateUser(id: number, userUpdated: UpdateUserDto): Promise<User>;
     deleteUser(id: number): Promise<boolean>;
+    saveLog(statusCode: number, path: string, error: string, errorcode: string): Promise<void>;
 }

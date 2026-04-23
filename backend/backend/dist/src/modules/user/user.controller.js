@@ -51,13 +51,17 @@ let UserController = class UserController {
         }
         return result;
     }
-    updateUser(id, user, req) {
+    async updateUser(id, user, req) {
         const currentUserId = req['user'].sub;
         const isAdmin = req['user'].role === 'admin';
         if (!isAdmin && currentUserId !== id) {
             throw new common_1.ForbiddenException('No puedes editar el perfil de otro usuario');
         }
-        return this.userSvc.updateUser(id, user);
+        const result = await this.userSvc.updateUser(id, user);
+        if (user.role) {
+            await this.userSvc.saveLog(200, '/api/user', `Cambio de rol: usuario ${id} cambió a ${user.role} por usuario ${currentUserId}`, 'ROLE_CHANGED');
+        }
+        return result;
     }
 };
 exports.UserController = UserController;
@@ -101,7 +105,7 @@ __decorate([
     __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object, Object]),
-    __metadata("design:returntype", Object)
+    __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateUser", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)("api/user"),
