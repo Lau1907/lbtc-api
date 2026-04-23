@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
 import { AppModule } from './app.module';
-import { AllExceptionFilter } from './common/filters/http-execption.filter.ts';
+import { AllExceptionFilter } from './common/filters/http-execption.filter';
 import { PrismaService } from './common/services/prisma.service';
 
 async function bootstrap() {

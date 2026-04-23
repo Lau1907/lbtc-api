@@ -25,10 +25,22 @@
       <input type="text" [(ngModel)]="username" placeholder="Elige un usuario" class="form-input" />
     </div>
 
-    <div class="form-group">
-      <label>Contraseña</label>
-      <input type="password" [(ngModel)]="password" placeholder="••••••••" class="form-input" />
-    </div>
+        <div class="form-group">
+  <label>Contraseña</label>
+  <input
+    type="password"
+    [(ngModel)]="password"
+    (ngModelChange)="onPasswordChange()"
+    placeholder="••••••••"
+    class="form-input"
+  />
+  <ul class="password-rules" *ngIf="password.length > 0">
+    <li [class.ok]="password.length >= 8">Mínimo 8 caracteres</li>
+    <li [class.ok]="/[A-Z]/.test(password)">Al menos una mayúscula</li>
+    <li [class.ok]="/[0-9]/.test(password)">Al menos un número</li>
+    <li [class.ok]="/[!@#$%^&*]/.test(password)">Al menos un carácter especial (!@#$%^&*)</li>
+  </ul>
+</div>
 
     <button class="btn-login" (click)="register()">Crear cuenta</button>
 

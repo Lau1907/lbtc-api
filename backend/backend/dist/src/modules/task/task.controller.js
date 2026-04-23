@@ -15,14 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const auth_guards_1 = require("../../common/guards/auth.guards");
 const task_service_1 = require("./task.service");
 let TaskController = class TaskController {
     taskSvc;
     constructor(taskSvc) {
         this.taskSvc = taskSvc;
     }
-    async getTasks() {
-        return await this.taskSvc.getTasks();
+    async getTasks(req) {
+        const userId = req['user'].sub;
+        return await this.taskSvc.getTasksByUser(userId);
     }
     async getTaskById(id) {
         var task = await this.taskSvc.getTaskById(id);
@@ -48,8 +50,10 @@ exports.TaskController = TaskController;
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Lista de tareas disponibles' }),
+    (0, common_1.UseGuards)(auth_guards_1.AuthGuard),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "getTasks", null);
 __decorate([

@@ -8,6 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
+const core_1 = require("@nestjs/core");
+const roles_guard_1 = require("../../common/guards/roles.guard");
 const database_module_1 = require("../../common/providers/database.module");
 const util_service_1 = require("../../common/services/util.service");
 const prisma_module_1 = require("../../prisma.module");
@@ -20,7 +22,7 @@ exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule, prisma_module_1.PrismaModule],
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService, util_service_1.UtilService],
+        providers: [user_service_1.UserService, util_service_1.UtilService, roles_guard_1.RolesGuard, core_1.Reflector],
         exports: [user_service_1.UserService],
     })
 ], UserModule);

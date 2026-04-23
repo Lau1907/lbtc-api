@@ -105,3 +105,27 @@
 }
 
 .register-link a:hover { text-decoration: underline; }
+
+.password-rules {
+  list-style: none;
+  padding: 10px 0 0 0;
+  margin: 0;
+  font-size: 12px;
+}
+
+.password-rules li {
+  color: #ff6b6b;
+  padding: 2px 0;
+}
+
+.password-rules li::before {
+  content: '✕ ';
+}
+
+.password-rules li.ok {
+  color: #51cf66;
+}
+
+.password-rules li.ok::before {
+  content: '✓ ';
+}

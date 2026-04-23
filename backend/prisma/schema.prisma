@@ -13,7 +13,8 @@ model User {
   lastname   String
   username   String   @unique
   password   String
-  hash       String?  // 👈 agrega esto
+  hash       String?  
+  role       String @default("user")
   created_at DateTime @default(now())
     tasks Task[]
 

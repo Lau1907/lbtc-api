@@ -15,23 +15,35 @@ export class UserService {
     ) {}
 
     // 📋 Obtener usuarios
-    public async getUsers(): Promise<User[]> {
-        return await this.prisma.user.findMany();
+    public async getUsers(): Promise<any[]> {
+  return await this.prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      username: true,
+      role: true,
+      created_at: true
     }
+  });
+}
 
-    // 🔍 Obtener usuario por ID
-    public async getUserById(id: number): Promise<User> {
-
-        const user = await this.prisma.user.findUnique({
-            where: { id }
-        });
-
-        if (!user) {
-            throw new Error(`User with id ${id} not found`);
-        }
-
-        return user;
+public async getUserById(id: number): Promise<any> {
+  const user = await this.prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      username: true,
+      role: true,
+      created_at: true
     }
+  });
+
+  if (!user) throw new Error(`User with id ${id} not found`);
+  return user;
+}
 
     // 🔍 Buscar por username (CLAVE PARA LOGIN)
     public async findByUsername(username: string): Promise<User | null> {

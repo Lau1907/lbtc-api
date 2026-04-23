@@ -14,7 +14,6 @@ const util_service_1 = require("../../common/services/util.service");
 const user_module_1 = require("../user/user.module");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
-const jwt_strategy_1 = require("./jwt.strategy");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -29,7 +28,7 @@ exports.AuthModule = AuthModule = __decorate([
             user_module_1.UserModule,
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, util_service_1.UtilService, prisma_service_1.PrismaService]
+        providers: [auth_service_1.AuthService, util_service_1.UtilService, prisma_service_1.PrismaService]
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

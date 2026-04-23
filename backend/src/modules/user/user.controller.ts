@@ -9,9 +9,13 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put,
+    UseGuards
 } from "@nestjs/common";
 
+import { Role } from 'src/common/decorators/roles.decorator';
+import { AuthGuard } from "src/common/guards/auth.guards";
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UtilService } from "src/common/services/util.service";
 import { CreateUserDto } from "../auth/dto/create-user-dto";
 import { UserService } from "./user.service";
@@ -22,8 +26,21 @@ export class UserController {
     constructor(private readonly userSvc: UserService, private readonly utilSvc: UtilService) {}
 
     @Get()
+    @UseGuards(AuthGuard, RolesGuard)
+    @Role('admin')
     public async getUsers(): Promise<any> {
         return await this.userSvc.getUsers();
+    }
+
+    @Delete(":id")
+    @UseGuards(AuthGuard, RolesGuard)
+    @Role('admin')
+    @HttpCode(HttpStatus.OK)
+    public async deleteUser(@Param("id", ParseIntPipe) id: number): Promise<boolean> {
+    const result = await this.userSvc.deleteUser(id);
+    if (!result)
+        throw new HttpException('No se pudo eliminar el usuario', HttpStatus.INTERNAL_SERVER_ERROR);
+    return result;
     }
 
     @Get(":id")
@@ -60,20 +77,4 @@ export class UserController {
         return this.userSvc.updateUser(id, user);
     }
 
-    @Delete(":id")
-    @HttpCode(HttpStatus.OK)
-    public async deleteUser(
-        @Param("id", ParseIntPipe) id: number
-    ): Promise<boolean> {
-
-        const result = await this.userSvc.deleteUser(id);
-
-        if (!result)
-            throw new HttpException(
-                "No se pudo eliminar el usuario",
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-
-        return result;
-    }
 }

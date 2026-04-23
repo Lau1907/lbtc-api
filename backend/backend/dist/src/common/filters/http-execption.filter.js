@@ -51,4 +51,4 @@ exports.AllExceptionFilter = AllExceptionFilter = __decorate([
     (0, common_1.Catch)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], AllExceptionFilter);
-//# sourceMappingURL=http-execption.filter.ts.js.map
+//# sourceMappingURL=http-execption.filter.js.map

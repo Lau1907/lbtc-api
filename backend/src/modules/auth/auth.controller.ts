@@ -22,8 +22,8 @@ export class AuthController {
     private readonly authSvc: AuthService,
     private readonly utilSvc: UtilService  ) {}
 
-  private async generateTokens(user: { id: number; name: string; lastname: string }) {
-    const basePayload = { sub: user.id, name: user.name, lastName: user.lastname };
+  private async generateTokens(user: { id: number; name: string; lastname: string, role: string }) {
+    const basePayload = { sub: user.id, name: user.name, lastName: user.lastname, role: user.role };
     const refresh_token_jwt = await this.utilSvc.generateJWT(basePayload, '7d');
     const hashRT = await this.utilSvc.hash(refresh_token_jwt);
     await this.authSvc.updateHash(user.id, hashRT);

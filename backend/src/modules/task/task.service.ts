@@ -60,4 +60,10 @@ public async insertTask(task: CreateTaskDto): Promise<Task> {
   });
   return true;
 }
+
+public async getTasksByUser(userId: number): Promise<Task[]> {
+  return await this.prisma.task.findMany({
+    where: { user_id: userId }
+  });
+}
 }

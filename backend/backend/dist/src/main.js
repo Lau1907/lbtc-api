@@ -5,7 +5,7 @@ const core_1 = require("@nestjs/core");
 const swagger_1 = require("@nestjs/swagger");
 require("dotenv/config");
 const app_module_1 = require("./app.module");
-const http_execption_filter_ts_1 = require("./common/filters/http-execption.filter.ts");
+const http_execption_filter_1 = require("./common/filters/http-execption.filter");
 const prisma_service_1 = require("./common/services/prisma.service");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
@@ -13,7 +13,7 @@ async function bootstrap() {
         whitelist: true
     }));
     const prisma = app.get(prisma_service_1.PrismaService);
-    app.useGlobalFilters(new http_execption_filter_ts_1.AllExceptionFilter(prisma));
+    app.useGlobalFilters(new http_execption_filter_1.AllExceptionFilter(prisma));
     const config = new swagger_1.DocumentBuilder()
         .setTitle('API con vulnerabilidades de seguridad')
         .setDescription('')

@@ -17,11 +17,25 @@ export class RegisterComponent {
   username = '';
   password = '';
   error = '';
+  passwordErrors: string[] = [];
 
   constructor(
     private auth: AuthService,
     private router: Router
   ) {}
+
+  validatePassword(password: string): string[] {
+    const errors = [];
+    if (password.length < 8) errors.push('Mínimo 8 caracteres');
+    if (!/[A-Z]/.test(password)) errors.push('Al menos una mayúscula');
+    if (!/[0-9]/.test(password)) errors.push('Al menos un número');
+    if (!/[!@#$%^&*]/.test(password)) errors.push('Al menos un carácter especial (!@#$%^&*)');
+    return errors;
+  }
+
+  onPasswordChange() {
+    this.passwordErrors = this.validatePassword(this.password);
+  }
 
   register() {
     this.auth.register({

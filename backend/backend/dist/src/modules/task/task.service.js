@@ -63,6 +63,11 @@ let TaskService = class TaskService {
         });
         return true;
     }
+    async getTasksByUser(userId) {
+        return await this.prisma.task.findMany({
+            where: { user_id: userId }
+        });
+    }
 };
 exports.TaskService = TaskService;
 exports.TaskService = TaskService = __decorate([

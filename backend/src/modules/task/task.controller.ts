@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { ApiOperation } from "@nestjs/swagger";
+import { AuthGuard } from "src/common/guards/auth.guards";
 import { TaskService } from "./task.service";
 @Controller("/api/task")
 export class TaskController{
@@ -8,8 +9,10 @@ export class TaskController{
 
     @Get()
     @ApiOperation({summary: 'Lista de tareas disponibles'})
-    public async getTasks(): Promise<any>{
-        return await this.taskSvc.getTasks();
+    @UseGuards(AuthGuard)
+    public async getTasks(@Req() req: any): Promise<any>{
+        const userId = req['user'].sub;
+        return await this.taskSvc.getTasksByUser(userId);
     }
 
     @Get(":id")
