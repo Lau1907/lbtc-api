@@ -21,6 +21,7 @@ export class LogsComponent implements OnInit {
   filterTo = '';
   currentUser: any = null;
   isAdmin = false;
+  filterUsername = '';
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
@@ -36,6 +37,8 @@ export class LogsComponent implements OnInit {
     if (this.filterStatus) params.append('statusCode', this.filterStatus);
     if (this.filterFrom) params.append('from', this.filterFrom);
     if (this.filterTo) params.append('to', this.filterTo);
+  if (this.filterUsername) params.append('username', this.filterUsername); 
+
 
     this.http.get<any[]>(`/api/logs?${params.toString()}`).subscribe(data => {
       this.logs = data;
@@ -53,6 +56,7 @@ export class LogsComponent implements OnInit {
     this.filterStatus = '';
     this.filterFrom = '';
     this.filterTo = '';
+    this.filterUsername= '';
     this.loadLogs();
   }
 }

@@ -27,7 +27,11 @@ let AllExceptionFilter = class AllExceptionFilter {
         const message = exception instanceof common_1.HttpException
             ? exception.getResponse()
             : 'Internal server error';
-        const errorMessage = typeof message === 'string' ? message : message.message;
+        const errorMessage = typeof message === 'string'
+            ? message
+            : Array.isArray(message.message)
+                ? message.message.join(', ')
+                : message.message;
         this.prisma.logs.create({
             data: {
                 statusCode: status,

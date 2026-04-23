@@ -21,7 +21,7 @@ export class UsersComponent implements OnInit {
   errorMsg = '';
   successMsg = '';
 
-  newUser = { name: '', lastname: '', username: '', password: '' };
+  newUser = { name: '', lastname: '', username: '', password: '', role: 'user' };
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
@@ -47,7 +47,7 @@ export class UsersComponent implements OnInit {
     this.http.post('/api/user', this.newUser).subscribe({
       next: () => {
         this.successMsg = 'Usuario creado exitosamente';
-        this.newUser = { name: '', lastname: '', username: '', password: '' };
+        this.newUser = { name: '', lastname: '', username: '', password: '' , role: 'user'};
         this.showForm = false;
         this.loadUsers();
         setTimeout(() => this.successMsg = '', 3000);

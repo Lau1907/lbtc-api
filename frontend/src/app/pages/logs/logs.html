@@ -25,22 +25,22 @@
       <p>Registro de eventos del sistema</p>
     </div>
 
-    <!-- Filtros -->
-    <div class="filters">
-      <input class="form-input" [(ngModel)]="filterPath" placeholder="Filtrar por ruta (ej: /api/auth)" />
-      <select class="form-input" [(ngModel)]="filterStatus">
-        <option value="">Todos los códigos</option>
-        <option value="200">200 OK</option>
-        <option value="401">401 Unauthorized</option>
-        <option value="403">403 Forbidden</option>
-        <option value="404">404 Not Found</option>
-        <option value="500">500 Server Error</option>
-      </select>
-      <input class="form-input" type="date" [(ngModel)]="filterFrom" />
-      <input class="form-input" type="date" [(ngModel)]="filterTo" />
-      <button class="btn-search" (click)="loadLogs()">🔍 Buscar</button>
-      <button class="btn-clear" (click)="clearFilters()">✕ Limpiar</button>
-    </div>
+<div class="filters">
+  <input class="form-input" [(ngModel)]="filterPath" placeholder="Filtrar por ruta (ej: /api/auth)" />
+  <input class="form-input" [(ngModel)]="filterUsername" placeholder="Filtrar por usuario" /> <!-- 👈 -->
+  <select class="form-input" [(ngModel)]="filterStatus">
+    <option value="">Todos los códigos</option>
+    <option value="200">200 OK</option>
+    <option value="401">401 Unauthorized</option>
+    <option value="403">403 Forbidden</option>
+    <option value="404">404 Not Found</option>
+    <option value="500">500 Server Error</option>
+  </select>
+  <input class="form-input" type="date" [(ngModel)]="filterFrom" />
+  <input class="form-input" type="date" [(ngModel)]="filterTo" />
+  <button class="btn-search" (click)="loadLogs()">🔍 Buscar</button>
+  <button class="btn-clear" (click)="clearFilters()">✕ Limpiar</button>
+</div>
 
     <!-- Tabla logs -->
     <div class="logs-table">

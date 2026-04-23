@@ -35,6 +35,10 @@
       <input class="form-input" [(ngModel)]="newUser.lastname" placeholder="Apellido" />
       <input class="form-input" [(ngModel)]="newUser.username" placeholder="Usuario" />
       <input class="form-input" type="password" [(ngModel)]="newUser.password" placeholder="Contraseña" />
+        <select class="form-input" [(ngModel)]="newUser.role">
+    <option value="user">Usuario</option>
+    <option value="admin">Administrador</option>
+  </select>
       <button class="btn-save" (click)="createUser()">💾 Guardar</button>
       <button class="btn-cancel" (click)="showForm = false">✕ Cancelar</button>
     </div>
@@ -49,6 +53,10 @@
           <input class="form-input" [(ngModel)]="editingUser.lastname" placeholder="Apellido" />
           <input class="form-input" [(ngModel)]="editingUser.username" placeholder="Usuario" />
           <input class="form-input" type="password" [(ngModel)]="editingUser.password" placeholder="Nueva contraseña" />
+          <select class="form-input" [(ngModel)]="editingUser.role"> 
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
           <div class="edit-actions">
             <button class="btn-save" (click)="saveEdit()">💾 Guardar</button>
             <button class="btn-cancel" (click)="cancelEdit()">✕ Cancelar</button>
