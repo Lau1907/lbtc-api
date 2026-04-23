@@ -18,6 +18,7 @@ export class RegisterComponent {
   password = '';
   error = '';
   passwordErrors: string[] = [];
+  role = 'user';
 
   constructor(
     private auth: AuthService,
@@ -42,7 +43,8 @@ export class RegisterComponent {
       name: this.name,
       lastname: this.lastname,
       username: this.username,
-      password: this.password
+      password: this.password,
+      role: this.role
     }).subscribe({
       next: (res) => {
         this.auth.saveTokens(res.access_token, res.refresh_token);

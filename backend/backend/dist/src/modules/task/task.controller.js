@@ -33,8 +33,10 @@ let TaskController = class TaskController {
         else
             throw new common_1.HttpException('Task not found', common_1.HttpStatus.NOT_FOUND);
     }
-    async insertTask(task) {
-        return await this.taskSvc.insertTask(task);
+    async insertTask(task, req) {
+        const result = await this.taskSvc.insertTask(task);
+        await this.taskSvc.saveLog(201, '/api/task', `Tarea creada: ${task.name} por usuario ${req['user'].sub}`, 'TASK_CREATED');
+        return result;
     }
     async deleteTask(id, req) {
         const userId = req['user'].sub;
@@ -45,6 +47,7 @@ let TaskController = class TaskController {
         const result = await this.taskSvc.deleteTask(id);
         if (!result)
             throw new common_1.HttpException('No se pudo eliminar la tarea', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        await this.taskSvc.saveLog(200, '/api/task', `Tarea eliminada: ${id} por usuario ${userId}`, 'TASK_DELETED');
         return result;
     }
     async updateTask(id, task, req) {
@@ -75,9 +78,11 @@ __decorate([
 ], TaskController.prototype, "getTaskById", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(auth_guards_1.AuthGuard),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "insertTask", null);
 __decorate([

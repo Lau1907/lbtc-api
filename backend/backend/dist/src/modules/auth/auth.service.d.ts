@@ -18,5 +18,6 @@ export declare class AuthService {
     updateHash(userId: number, hash: string | null): Promise<User>;
     getUserById(id: number): Promise<User | null>;
     getUserByUsername(username: string): Promise<User | null>;
-    register(name: string, lastname: string, username: string, hashedPassword: string): Promise<User>;
+    register(name: string, lastname: string, username: string, hashedPassword: string, role: string): Promise<User>;
+    saveLog(statusCode: number, path: string, error: string, errorcode: string): Promise<void>;
 }

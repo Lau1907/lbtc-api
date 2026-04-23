@@ -42,6 +42,14 @@
   </ul>
 </div>
 
+<div class="form-group">
+  <label>Rol</label>
+  <select [(ngModel)]="role" class="form-input">
+    <option value="user">Usuario</option>
+    <option value="admin">Administrador</option>
+  </select>
+</div>
+
     <button class="btn-login" (click)="register()">Crear cuenta</button>
 
     <p class="register-link">

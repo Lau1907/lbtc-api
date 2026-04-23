@@ -72,6 +72,17 @@ let TaskService = class TaskService {
             where: { user_id: userId }
         });
     }
+    async saveLog(statusCode, path, error, errorcode) {
+        await this.prisma.logs.create({
+            data: {
+                statusCode,
+                timeStamp: new Date(),
+                path,
+                error,
+                errorcode
+            }
+        }).catch(err => console.error('Error al guardar log:', err));
+    }
 };
 exports.TaskService = TaskService;
 exports.TaskService = TaskService = __decorate([

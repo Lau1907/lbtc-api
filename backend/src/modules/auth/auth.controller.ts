@@ -38,29 +38,32 @@ export class AuthController {
 @HttpCode(HttpStatus.CREATED)
 public async register(@Body() createUserDto: CreateUserDto) {
   try {
-    const { name, lastname, username, password } = createUserDto;
+    const { name, lastname, username, password, role } = createUserDto;
     const hashedPassword = await this.utilSvc.hashPassword(password);
-    const user = await this.authSvc.register(name, lastname, username, hashedPassword);
+    const user = await this.authSvc.register(name, lastname, username, hashedPassword, role ?? 'user');
     return this.generateTokens(user);
   } catch (error) {
-    console.error('REGISTER ERROR:', error); // 👈 agrega esto
+    console.error('REGISTER ERROR:', error); 
     throw error;
   }
 }
 // Autentica al usuario y devuelve tokens si las credenciales son correctas
-  @Post('/login')
-  @HttpCode(HttpStatus.OK)
-  public async login(@Body() loginDto: LoginDto): Promise<any> {
-    const { username, password } = loginDto;
+@Post('/login')
+@HttpCode(HttpStatus.OK)
+public async login(@Body() loginDto: LoginDto): Promise<any> {
+  const { username, password } = loginDto;
 
-    const user = await this.authSvc.getUserByUsername(username);
-    if (!user) throw new UnauthorizedException('El usuario y/o contraseña es incorrecto');
+  const user = await this.authSvc.getUserByUsername(username);
+  if (!user) throw new UnauthorizedException('El usuario y/o contraseña es incorrecto');
 
-    if (!(await this.utilSvc.checkPassword(password!, user.password!)))
-      throw new UnauthorizedException('El usuario y/o contraseña son incorrectos');
+  if (!(await this.utilSvc.checkPassword(password!, user.password!)))
+    throw new UnauthorizedException('El usuario y/o contraseña son incorrectos');
 
-    return this.generateTokens(user);
-  }
+  // 👇 Log de login exitoso
+  await this.authSvc.saveLog(200, '/api/auth/login', `Login exitoso: ${username}`, 'LOGIN_SUCCESS');
+
+  return this.generateTokens(user);
+}
 
   // Devuelve el perfil del usuario autenticado desde el token
   @Get('/me')

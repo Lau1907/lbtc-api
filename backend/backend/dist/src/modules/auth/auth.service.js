@@ -125,10 +125,21 @@ let AuthService = class AuthService {
     async getUserByUsername(username) {
         return await this.prisma.user.findFirst({ where: { username } });
     }
-    async register(name, lastname, username, hashedPassword) {
+    async register(name, lastname, username, hashedPassword, role) {
         return await this.prisma.user.create({
-            data: { name, lastname, username, password: hashedPassword },
+            data: { name, lastname, username, password: hashedPassword, role },
         });
+    }
+    async saveLog(statusCode, path, error, errorcode) {
+        await this.prisma.logs.create({
+            data: {
+                statusCode,
+                timeStamp: new Date(),
+                path,
+                error,
+                errorcode
+            }
+        }).catch(err => console.error('Error al guardar log:', err));
     }
 };
 exports.AuthService = AuthService;

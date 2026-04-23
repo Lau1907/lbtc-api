@@ -16,11 +16,11 @@ export class AuthService {
     );
   }
 
-  register(data: { name: string; lastname: string; username: string; password: string }) {
-    return this.http.post<{ access_token: string; refresh_token: string }>(
-      `${this.apiUrl}/register`, data
-    );
-  }
+register(data: { name: string; lastname: string; username: string; password: string; role: string }) {
+  return this.http.post<{ access_token: string; refresh_token: string }>(
+    `${this.apiUrl}/register`, data
+  );
+}
 
   saveTokens(access_token: string, refresh_token: string) {
     localStorage.setItem('access_token', access_token);

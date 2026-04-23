@@ -23,27 +23,34 @@ export class TaskController{
         else throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
     }
 
-    @Post()
-    public async insertTask(@Body() task: any): Promise<any> {
-        return await this.taskSvc.insertTask(task);
-    }
+@Post()
+@UseGuards(AuthGuard)
+public async insertTask(@Body() task: any, @Req() req: any): Promise<any> {
+  const result = await this.taskSvc.insertTask(task);
+  
+  // 👇 Log de creación de tarea
+  await this.taskSvc.saveLog(201, '/api/task', `Tarea creada: ${task.name} por usuario ${req['user'].sub}`, 'TASK_CREATED');
+  
+  return result;
+}
 
-    @Delete(":id")
+@Delete(":id")
 @UseGuards(AuthGuard)
 @HttpCode(HttpStatus.OK)
-public async deleteTask(
-  @Param("id", ParseIntPipe) id: number,
-  @Req() req: any
-): Promise<boolean> {
+public async deleteTask(@Param("id", ParseIntPipe) id: number, @Req() req: any): Promise<boolean> {
   const userId = req['user'].sub;
   const task = await this.taskSvc.getTaskById(id);
-  
+
   if (task.user_id !== userId) {
     throw new ForbiddenException('No puedes eliminar tareas de otros usuarios');
   }
 
   const result = await this.taskSvc.deleteTask(id);
   if (!result) throw new HttpException('No se pudo eliminar la tarea', HttpStatus.INTERNAL_SERVER_ERROR);
+
+  // 👇 Log de eliminación de tarea
+  await this.taskSvc.saveLog(200, '/api/task', `Tarea eliminada: ${id} por usuario ${userId}`, 'TASK_DELETED');
+
   return result;
 }
 

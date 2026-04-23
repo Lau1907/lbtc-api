@@ -14,4 +14,5 @@ export declare class TaskService {
     updateTask(id: number, taskUpdated: UpdateTaskDto): Promise<Task>;
     deleteTask(id: number): Promise<boolean>;
     getTasksByUser(userId: number): Promise<Task[]>;
+    saveLog(statusCode: number, path: string, error: string, errorcode: string): Promise<void>;
 }

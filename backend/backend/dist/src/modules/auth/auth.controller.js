@@ -36,9 +36,9 @@ let AuthController = class AuthController {
     }
     async register(createUserDto) {
         try {
-            const { name, lastname, username, password } = createUserDto;
+            const { name, lastname, username, password, role } = createUserDto;
             const hashedPassword = await this.utilSvc.hashPassword(password);
-            const user = await this.authSvc.register(name, lastname, username, hashedPassword);
+            const user = await this.authSvc.register(name, lastname, username, hashedPassword, role ?? 'user');
             return this.generateTokens(user);
         }
         catch (error) {
@@ -53,6 +53,7 @@ let AuthController = class AuthController {
             throw new common_1.UnauthorizedException('El usuario y/o contraseña es incorrecto');
         if (!(await this.utilSvc.checkPassword(password, user.password)))
             throw new common_1.UnauthorizedException('El usuario y/o contraseña son incorrectos');
+        await this.authSvc.saveLog(200, '/api/auth/login', `Login exitoso: ${username}`, 'LOGIN_SUCCESS');
         return this.generateTokens(user);
     }
     getProfile(req) {

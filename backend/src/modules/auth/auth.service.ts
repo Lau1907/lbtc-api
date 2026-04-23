@@ -106,11 +106,22 @@ export class AuthService {
     return await this.prisma.user.findFirst({ where: { username } });
   }
 
-  async register(name: string, lastname: string, username: string, hashedPassword: string): Promise<User> {
+  async register(name: string, lastname: string, username: string, hashedPassword: string, role: string): Promise<User> {
     return await this.prisma.user.create({
-      data: { name, lastname, username, password: hashedPassword },
+      data: { name, lastname, username, password: hashedPassword, role },
     });
   }
 
-  
+  // Guarda un log de evento en la base de datos
+public async saveLog(statusCode: number, path: string, error: string, errorcode: string): Promise<void> {
+  await this.prisma.logs.create({
+    data: {
+      statusCode,
+      timeStamp: new Date(),
+      path,
+      error,
+      errorcode
+    }
+  }).catch(err => console.error('Error al guardar log:', err));
+}
 }

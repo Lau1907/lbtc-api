@@ -75,4 +75,17 @@ public async getTasksByUser(userId: number): Promise<Task[]> {
     where: { user_id: userId }
   });
 }
+
+// Guarda un log de evento en la base de datos
+public async saveLog(statusCode: number, path: string, error: string, errorcode: string): Promise<void> {
+  await this.prisma.logs.create({
+    data: {
+      statusCode,
+      timeStamp: new Date(),
+      path,
+      error,
+      errorcode
+    }
+  }).catch(err => console.error('Error al guardar log:', err));
+}
 }
