@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -18,6 +18,8 @@ export class UsersComponent implements OnInit {
   showForm = false;
   currentUser: any = null;
   isAdmin = false;
+  errorMsg = '';
+  successMsg = '';
 
   newUser = { name: '', lastname: '', username: '', password: '' };
 
@@ -29,25 +31,28 @@ export class UsersComponent implements OnInit {
     this.loadUsers();
   }
 
-  private getHeaders() {
-    return {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`
-      })
-    };
-  }
-
   loadUsers() {
-    this.http.get<any[]>('/api/user', this.getHeaders()).subscribe(data => {
-      this.users = data;
+    this.http.get<any[]>('/api/user').subscribe({
+      next: (data) => this.users = data,
+      error: () => this.errorMsg = 'Error al cargar usuarios'
     });
   }
 
   createUser() {
-    this.http.post('/api/user', this.newUser, this.getHeaders()).subscribe(() => {
-      this.newUser = { name: '', lastname: '', username: '', password: '' };
-      this.showForm = false;
-      this.loadUsers();
+    this.errorMsg = '';
+    if (!this.newUser.name || !this.newUser.username || !this.newUser.password) {
+      this.errorMsg = 'Todos los campos son requeridos';
+      return;
+    }
+    this.http.post('/api/user', this.newUser).subscribe({
+      next: () => {
+        this.successMsg = 'Usuario creado exitosamente';
+        this.newUser = { name: '', lastname: '', username: '', password: '' };
+        this.showForm = false;
+        this.loadUsers();
+        setTimeout(() => this.successMsg = '', 3000);
+      },
+      error: () => this.errorMsg = 'Error al crear el usuario'
     });
   }
 
@@ -56,9 +61,14 @@ export class UsersComponent implements OnInit {
   }
 
   saveEdit() {
-    this.http.put(`/api/user/${this.editingUser.id}`, this.editingUser, this.getHeaders()).subscribe(() => {
-      this.editingUser = null;
-      this.loadUsers();
+    this.http.put(`/api/user/${this.editingUser.id}`, this.editingUser).subscribe({
+      next: () => {
+        this.successMsg = 'Usuario actualizado';
+        this.editingUser = null;
+        this.loadUsers();
+        setTimeout(() => this.successMsg = '', 3000);
+      },
+      error: () => this.errorMsg = 'Error al actualizar el usuario'
     });
   }
 
@@ -66,8 +76,13 @@ export class UsersComponent implements OnInit {
 
   deleteUser(id: number) {
     if (!confirm('¿Eliminar este usuario?')) return;
-    this.http.delete(`/api/user/${id}`, this.getHeaders()).subscribe(() => {
-      this.loadUsers();
+    this.http.delete(`/api/user/${id}`).subscribe({
+      next: () => {
+        this.successMsg = 'Usuario eliminado';
+        this.loadUsers();
+        setTimeout(() => this.successMsg = '', 3000);
+      },
+      error: () => this.errorMsg = 'Error al eliminar el usuario'
     });
   }
 }

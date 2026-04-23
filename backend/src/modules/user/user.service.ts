@@ -14,7 +14,7 @@ export class UserService {
         private prisma: PrismaService
     ) {}
 
-    // 📋 Obtener usuarios
+// Obtiene todos los usuarios sin exponer datos sensibles
     public async getUsers(): Promise<any[]> {
   return await this.prisma.user.findMany({
     select: {
@@ -45,7 +45,7 @@ public async getUserById(id: number): Promise<any> {
   return user;
 }
 
-    // 🔍 Buscar por username (CLAVE PARA LOGIN)
+// Busca un usuario por su nombre de usuario para autenticación
     public async findByUsername(username: string): Promise<User | null> {
         return await this.prisma.user.findFirst({
             where: { username }

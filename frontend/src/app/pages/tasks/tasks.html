@@ -26,6 +26,9 @@
       <p>Crea y gestiona tus tareas</p>
     </div>
 
+  <div class="alert-success" *ngIf="successMsg">{{ successMsg }}</div>
+  <div class="alert-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
     <!-- Formulario agregar -->
     <div class="task-form">
   <input class="form-input" [(ngModel)]="title" placeholder="Título de la tarea" />
@@ -51,8 +54,7 @@
   </div>
 </div>
 
-        <!-- Modo vista -->
-        <!-- Modo vista -->
+
 <div *ngIf="editingTask?.id !== task.id" class="view-mode">
   <div class="task-info">
     <h4>{{ task.name }} <span class="badge" *ngIf="task.priority"> Alta</span></h4>

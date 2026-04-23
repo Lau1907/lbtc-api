@@ -36,14 +36,24 @@ let TaskController = class TaskController {
     async insertTask(task) {
         return await this.taskSvc.insertTask(task);
     }
-    updateTask(id, task) {
-        return this.taskSvc.updateTask((id), task);
-    }
-    async deleteTask(id) {
+    async deleteTask(id, req) {
+        const userId = req['user'].sub;
+        const task = await this.taskSvc.getTaskById(id);
+        if (task.user_id !== userId) {
+            throw new common_1.ForbiddenException('No puedes eliminar tareas de otros usuarios');
+        }
         const result = await this.taskSvc.deleteTask(id);
         if (!result)
             throw new common_1.HttpException('No se pudo eliminar la tarea', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         return result;
+    }
+    async updateTask(id, task, req) {
+        const userId = req['user'].sub;
+        const existingTask = await this.taskSvc.getTaskById(id);
+        if (existingTask.user_id !== userId) {
+            throw new common_1.ForbiddenException('No puedes editar tareas de otros usuarios');
+        }
+        return this.taskSvc.updateTask(id, task);
     }
 };
 exports.TaskController = TaskController;
@@ -71,21 +81,25 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "insertTask", null);
 __decorate([
-    (0, common_1.Put)(":id"),
-    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Object)
-], TaskController.prototype, "updateTask", null);
-__decorate([
     (0, common_1.Delete)(":id"),
+    (0, common_1.UseGuards)(auth_guards_1.AuthGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "deleteTask", null);
+__decorate([
+    (0, common_1.Put)(":id"),
+    (0, common_1.UseGuards)(auth_guards_1.AuthGuard),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object, Object]),
+    __metadata("design:returntype", Promise)
+], TaskController.prototype, "updateTask", null);
 exports.TaskController = TaskController = __decorate([
     (0, common_1.Controller)("/api/task"),
     __metadata("design:paramtypes", [task_service_1.TaskService])

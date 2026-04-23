@@ -26,6 +26,9 @@
       <button class="btn-add" (click)="showForm = !showForm">+ Nuevo usuario</button>
     </div>
 
+  <div class="alert-success" *ngIf="successMsg">{{ successMsg }}</div>
+  <div class="alert-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
     <!-- Formulario nuevo usuario -->
     <div class="task-form card-form" *ngIf="showForm">
       <input class="form-input" [(ngModel)]="newUser.name" placeholder="Nombre" />

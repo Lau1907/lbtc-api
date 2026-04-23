@@ -31,6 +31,7 @@ export class TaskService {
     return task;
 }
 
+// Valida y crea una nueva tarea sanitizando las entradas
 public async insertTask(task: CreateTaskDto): Promise<Task> {
   // Sanitización
   const name = task.name?.trim().substring(0, 100) ?? '';
@@ -48,6 +49,7 @@ public async insertTask(task: CreateTaskDto): Promise<Task> {
   });
 }
 
+// Actualiza una tarea existente por ID
     public async updateTask(id: number, taskUpdated: UpdateTaskDto): Promise<Task> {
   return await this.prisma.task.update({
     where: { id },
@@ -59,7 +61,7 @@ public async insertTask(task: CreateTaskDto): Promise<Task> {
   });
 }
 
-    // 🗑️ Eliminar tarea
+// Elimina una tarea por ID
     public async deleteTask(id: number): Promise<boolean> {
   await this.prisma.task.delete({
     where: { id }
@@ -67,6 +69,7 @@ public async insertTask(task: CreateTaskDto): Promise<Task> {
   return true;
 }
 
+// Obtiene todas las tareas del usuario autenticado
 public async getTasksByUser(userId: number): Promise<Task[]> {
   return await this.prisma.task.findMany({
     where: { user_id: userId }

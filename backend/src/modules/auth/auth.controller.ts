@@ -22,6 +22,7 @@ export class AuthController {
     private readonly authSvc: AuthService,
     private readonly utilSvc: UtilService  ) {}
 
+  // Genera tokens de acceso y refresh para el usuario autenticado
   private async generateTokens(user: { id: number; name: string; lastname: string, role: string }) {
     const basePayload = { sub: user.id, name: user.name, lastName: user.lastname, role: user.role };
     const refresh_token_jwt = await this.utilSvc.generateJWT(basePayload, '7d');
@@ -32,6 +33,7 @@ export class AuthController {
     return { access_token, refresh_token: refresh_token_jwt };
   }
 
+  // Registra un nuevo usuario y devuelve tokens JWT
   @Post('/register')
 @HttpCode(HttpStatus.CREATED)
 public async register(@Body() createUserDto: CreateUserDto) {
@@ -45,7 +47,7 @@ public async register(@Body() createUserDto: CreateUserDto) {
     throw error;
   }
 }
-
+// Autentica al usuario y devuelve tokens si las credenciales son correctas
   @Post('/login')
   @HttpCode(HttpStatus.OK)
   public async login(@Body() loginDto: LoginDto): Promise<any> {
@@ -60,12 +62,14 @@ public async register(@Body() createUserDto: CreateUserDto) {
     return this.generateTokens(user);
   }
 
+  // Devuelve el perfil del usuario autenticado desde el token
   @Get('/me')
   @UseGuards(AuthGuard)
   public getProfile(@Req() req: any) {
     return req['user'];
   }
 
+  // Genera nuevos tokens usando el refresh token
   @Post('/refresh')
   @UseGuards(AuthGuard)
   public async refreshToken(@Req() req: any) {
@@ -81,6 +85,7 @@ public async register(@Body() createUserDto: CreateUserDto) {
     return this.generateTokens(user);
   }
 
+  // Invalida el hash del refresh token para cerrar sesión
   @Post('/logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AuthGuard)

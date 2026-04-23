@@ -20,6 +20,8 @@ export class TasksComponent implements OnInit {
   editingTask: any = null;
   currentUser: any=null;
   isAdmin = false;
+  errorMsg = '';
+  successMsg = '';
 
   constructor(private taskService: TaskService, private auth: AuthService) {}
 
@@ -36,6 +38,7 @@ export class TasksComponent implements OnInit {
   }
 
   addTask() {
+  this.errorMsg = '';
   this.title = this.title.trim();
   this.description = this.description.trim();
 
@@ -44,8 +47,11 @@ export class TasksComponent implements OnInit {
     alert('El título no puede tener más de 100 caracteres');
     return;
   }
+   if (!this.title) {
+    this.errorMsg = 'El título es requerido';
+    return;
+  }
 
-  // Prevenir XSS — eliminar tags HTML
   this.title = this.title.replace(/<[^>]*>/g, '');
   this.description = this.description.replace(/<[^>]*>/g, '');
 
@@ -56,18 +62,27 @@ export class TasksComponent implements OnInit {
     user_id: 1
   }).subscribe({
     next: () => {
+      this.successMsg = 'Tarea creada exitosamente ';
       this.title = '';
       this.description = '';
       this.priority = false;
       this.loadTasks();
+      setTimeout(() => this.successMsg = '', 3000);
     },
     error: () => alert('Error al crear la tarea')
   });
 }
   deleteTask(id: number) {
   if (!confirm('¿Estás seguro de que quieres eliminar esta tarea?')) return;
-  this.taskService.deleteTask(id).subscribe(() => {
-    this.loadTasks();
+  this.taskService.deleteTask(id).subscribe({
+    next: () => {
+      this.successMsg = 'Tarea eliminada ';
+      this.loadTasks();
+      setTimeout(() => this.successMsg = '', 3000);
+    },
+    error: () => {
+      this.errorMsg = 'Error al eliminar la tarea';
+    }
   });
 }
 
@@ -76,11 +91,18 @@ export class TasksComponent implements OnInit {
   }
 
   saveEdit() {
-    this.taskService.updateTask(this.editingTask.id, this.editingTask).subscribe(() => {
+  this.taskService.updateTask(this.editingTask.id, this.editingTask).subscribe({
+    next: () => {
+      this.successMsg = 'Tarea actualizada';
       this.editingTask = null;
       this.loadTasks();
-    });
-  }
+      setTimeout(() => this.successMsg = '', 3000);
+    },
+    error: () => {
+      this.errorMsg = 'Error al actualizar la tarea';
+    }
+  });
+}
 
   cancelEdit() {
     this.editingTask = null;

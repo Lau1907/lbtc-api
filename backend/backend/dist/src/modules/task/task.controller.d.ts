@@ -5,6 +5,6 @@ export declare class TaskController {
     getTasks(req: any): Promise<any>;
     getTaskById(id: number): Promise<any>;
     insertTask(task: any): Promise<any>;
-    updateTask(id: number, task: any): any;
-    deleteTask(id: number): Promise<boolean>;
+    deleteTask(id: number, req: any): Promise<boolean>;
+    updateTask(id: number, task: any, req: any): Promise<any>;
 }

@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Delete,
+    ForbiddenException,
     Get,
     HttpCode,
     HttpException,
@@ -10,6 +11,7 @@ import {
     ParseIntPipe,
     Post,
     Put,
+    Req,
     UseGuards
 } from "@nestjs/common";
 
@@ -70,10 +72,19 @@ export class UserController {
   }
 
     @Put(":id")
+    @UseGuards(AuthGuard)
     public updateUser(
         @Param("id", ParseIntPipe) id: number,
-        @Body() user: any
+        @Body() user: any,
+        @Req() req: any
     ): any {
+        const currentUserId = req['user'].sub;
+        const isAdmin = req['user'].role === 'admin';
+
+        // Si no es admin, solo puede editar su propio perfil
+        if (!isAdmin && currentUserId !== id) {
+            throw new ForbiddenException('No puedes editar el perfil de otro usuario');
+        }    
         return this.userSvc.updateUser(id, user);
     }
 

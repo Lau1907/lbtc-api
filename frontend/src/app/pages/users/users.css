@@ -187,3 +187,23 @@
   font-size: 13px;
   cursor: pointer;
 }
+
+.alert-success {
+  background: rgba(80,200,80,0.15);
+  border: 1px solid rgba(80,200,80,0.3);
+  color: #51cf66;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.alert-error {
+  background: rgba(255,80,80,0.15);
+  border: 1px solid rgba(255,80,80,0.3);
+  color: #ff6b6b;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}

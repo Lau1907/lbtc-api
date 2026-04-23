@@ -51,7 +51,12 @@ let UserController = class UserController {
         }
         return result;
     }
-    updateUser(id, user) {
+    updateUser(id, user, req) {
+        const currentUserId = req['user'].sub;
+        const isAdmin = req['user'].role === 'admin';
+        if (!isAdmin && currentUserId !== id) {
+            throw new common_1.ForbiddenException('No puedes editar el perfil de otro usuario');
+        }
         return this.userSvc.updateUser(id, user);
     }
 };
@@ -90,10 +95,12 @@ __decorate([
 ], UserController.prototype, "insertUser", null);
 __decorate([
     (0, common_1.Put)(":id"),
+    (0, common_1.UseGuards)(auth_guards_1.AuthGuard),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, Object, Object]),
     __metadata("design:returntype", Object)
 ], UserController.prototype, "updateUser", null);
 exports.UserController = UserController = __decorate([
