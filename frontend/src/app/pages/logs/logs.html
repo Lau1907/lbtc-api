@@ -1,0 +1,61 @@
+<div class="dashboard">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <span>⚡</span>
+      <h2>LBTC</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a [routerLink]="['/dashboard']" class="nav-item">📊 Dashboard</a>
+      <a [routerLink]="['/tasks']" class="nav-item">✅ Tareas</a>
+      <a [routerLink]="['/users']" class="nav-item">👥 Usuarios</a>
+      <a [routerLink]="['/logs']" class="nav-item active">📋 Logs</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1>Auditoría 📋</h1>
+      <p>Registro de eventos del sistema</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters">
+      <input class="form-input" [(ngModel)]="filterPath" placeholder="Filtrar por ruta (ej: /api/auth)" />
+      <select class="form-input" [(ngModel)]="filterStatus">
+        <option value="">Todos los códigos</option>
+        <option value="200">200 OK</option>
+        <option value="401">401 Unauthorized</option>
+        <option value="403">403 Forbidden</option>
+        <option value="404">404 Not Found</option>
+        <option value="500">500 Server Error</option>
+      </select>
+      <input class="form-input" type="date" [(ngModel)]="filterFrom" />
+      <input class="form-input" type="date" [(ngModel)]="filterTo" />
+      <button class="btn-search" (click)="loadLogs()">🔍 Buscar</button>
+      <button class="btn-clear" (click)="clearFilters()">✕ Limpiar</button>
+    </div>
+
+    <!-- Tabla logs -->
+    <div class="logs-table">
+      <div class="table-header">
+        <span>ID</span>
+        <span>Fecha</span>
+        <span>Ruta</span>
+        <span>Estado</span>
+        <span>Error</span>
+      </div>
+
+      <div class="table-row" *ngFor="let log of logs">
+        <span class="log-id">#{{ log.id }}</span>
+        <span class="log-date">{{ log.timeStamp | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span class="log-path">{{ log.path }}</span>
+        <span [class]="'badge ' + getStatusClass(log.statusCode)">{{ log.statusCode }}</span>
+        <span class="log-error">{{ log.error }}</span>
+      </div>
+
+      <div class="empty" *ngIf="logs.length === 0">
+        No hay logs disponibles 📭
+      </div>
+    </div>
+  </div>
+</div>
