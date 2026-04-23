@@ -57,6 +57,9 @@ let UserController = class UserController {
         if (!isAdmin && currentUserId !== id) {
             throw new common_1.ForbiddenException('No puedes editar el perfil de otro usuario');
         }
+        if (user.password) {
+            user.password = await this.utilSvc.hashPassword(user.password);
+        }
         const result = await this.userSvc.updateUser(id, user);
         if (user.role) {
             await this.userSvc.saveLog(200, '/api/user', `Cambio de rol: usuario ${id} cambió a ${user.role} por usuario ${currentUserId}`, 'ROLE_CHANGED');
@@ -92,6 +95,8 @@ __decorate([
 ], UserController.prototype, "getUserById", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(auth_guards_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Role)('admin'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),

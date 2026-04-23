@@ -14,14 +14,16 @@
     <nav class="sidebar-nav">
       <a [routerLink]="['/dashboard']" class="nav-item">Dashboard</a>
       <a [routerLink]="['/tasks']" class="nav-item">Tareas</a>
-    <a *ngIf="isAdmin" [routerLink]="['/users']" class="nav-item active">Usuarios</a>
+    <a *ngIf="isAdmin" [routerLink]="['/user']" class="nav-item active">Usuarios</a>
     <a *ngIf="isAdmin" [routerLink]="['/logs']" class="nav-item">Logs</a>
     </nav>
+            <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+
   </div>
 
   <div class="main-content">
     <div class="header">
-      <h1>Usuarios 👥</h1>
+      <h1>Usuarios </h1>
       <p>Gestiona los usuarios del sistema</p>
       <button class="btn-add" (click)="showForm = !showForm">+ Nuevo usuario</button>
     </div>
@@ -34,12 +36,24 @@
       <input class="form-input" [(ngModel)]="newUser.name" placeholder="Nombre" />
       <input class="form-input" [(ngModel)]="newUser.lastname" placeholder="Apellido" />
       <input class="form-input" [(ngModel)]="newUser.username" placeholder="Usuario" />
-      <input class="form-input" type="password" [(ngModel)]="newUser.password" placeholder="Contraseña" />
-        <select class="form-input" [(ngModel)]="newUser.role">
+<input 
+  class="form-input" 
+  type="password" 
+  [(ngModel)]="newUser.password" 
+  (ngModelChange)="onPasswordChange()"
+  placeholder="Contraseña" 
+/>
+<ul class="password-rules" *ngIf="newUser.password.length > 0">
+  <li [class.ok]="newUser.password.length >= 8">Mínimo 8 caracteres</li>
+  <li [class.ok]="/[A-Z]/.test(newUser.password)">Al menos una mayúscula</li>
+  <li [class.ok]="/[0-9]/.test(newUser.password)">Al menos un número</li>
+  <li [class.ok]="/[!@#$%^&*]/.test(newUser.password)">Al menos un carácter especial</li>
+</ul>
+      <select class="form-input" [(ngModel)]="newUser.role">
     <option value="user">Usuario</option>
     <option value="admin">Administrador</option>
   </select>
-      <button class="btn-save" (click)="createUser()">💾 Guardar</button>
+      <button class="btn-save" (click)="createUser()">Guardar</button>
       <button class="btn-cancel" (click)="showForm = false">✕ Cancelar</button>
     </div>
 
@@ -52,13 +66,26 @@
           <input class="form-input" [(ngModel)]="editingUser.name" placeholder="Nombre" />
           <input class="form-input" [(ngModel)]="editingUser.lastname" placeholder="Apellido" />
           <input class="form-input" [(ngModel)]="editingUser.username" placeholder="Usuario" />
-          <input class="form-input" type="password" [(ngModel)]="editingUser.password" placeholder="Nueva contraseña" />
-          <select class="form-input" [(ngModel)]="editingUser.role"> 
-            <option value="user">Usuario</option>
-            <option value="admin">Administrador</option>
-          </select>
+<input 
+  class="form-input" 
+  type="password" 
+  [(ngModel)]="editingUser.password" 
+  (ngModelChange)="onEditPasswordChange()"
+  placeholder="Nueva contraseña (opcional)" 
+/>
+
+<ul *ngIf="editingUser.password?.length > 0">
+  <li [class.ok]="editingUser.password.length >= 8">Mínimo 8 caracteres</li>
+  <li [class.ok]="/[A-Z]/.test(editingUser.password)">Al menos una mayúscula</li>
+  <li [class.ok]="/[0-9]/.test(editingUser.password)">Al menos un número</li>
+  <li [class.ok]="/[!@#$%^&*]/.test(editingUser.password)">Al menos un carácter especial</li>
+</ul>            
+<select class="form-input" [(ngModel)]="editingUser.role">
+  <option value="user">Usuario</option>
+  <option value="admin">Administrador</option>
+</select>
           <div class="edit-actions">
-            <button class="btn-save" (click)="saveEdit()">💾 Guardar</button>
+            <button class="btn-save" (click)="saveEdit()"> Guardar</button>
             <button class="btn-cancel" (click)="cancelEdit()">✕ Cancelar</button>
           </div>
         </div>
@@ -70,8 +97,8 @@
             <p>@{{ user.username }}</p>
           </div>
           <div class="task-actions">
-            <button class="btn-edit" (click)="startEdit(user)">✏️</button>
-            <button class="btn-delete" (click)="deleteUser(user.id)">🗑️</button>
+            <button class="btn-edit" (click)="startEdit(user)"></button>
+            <button class="btn-delete" (click)="deleteUser(user.id)"></button>
           </div>
         </div>
 

@@ -34,13 +34,23 @@ let TaskController = class TaskController {
             throw new common_1.HttpException('Task not found', common_1.HttpStatus.NOT_FOUND);
     }
     async insertTask(task, req) {
-        const result = await this.taskSvc.insertTask(task);
-        await this.taskSvc.saveLog(201, '/api/task', `Tarea creada: ${task.name} por usuario ${req['user'].sub}`, 'TASK_CREATED');
+        const userId = req['user'].sub;
+        const result = await this.taskSvc.insertTask({
+            ...task,
+            user_id: userId
+        });
+        await this.taskSvc.saveLog(201, '/api/task', `Tarea creada: ${task.name} por usuario ${userId}`, 'TASK_CREATED');
         return result;
     }
     async deleteTask(id, req) {
         const userId = req['user'].sub;
-        const task = await this.taskSvc.getTaskById(id);
+        let task;
+        try {
+            task = await this.taskSvc.getTaskById(id);
+        }
+        catch {
+            throw new common_1.HttpException('Tarea no encontrada', common_1.HttpStatus.NOT_FOUND);
+        }
         if (task.user_id !== userId) {
             throw new common_1.ForbiddenException('No puedes eliminar tareas de otros usuarios');
         }
@@ -52,7 +62,13 @@ let TaskController = class TaskController {
     }
     async updateTask(id, task, req) {
         const userId = req['user'].sub;
-        const existingTask = await this.taskSvc.getTaskById(id);
+        let existingTask;
+        try {
+            existingTask = await this.taskSvc.getTaskById(id);
+        }
+        catch {
+            throw new common_1.HttpException('Tarea no encontrada', common_1.HttpStatus.NOT_FOUND);
+        }
         if (existingTask.user_id !== userId) {
             throw new common_1.ForbiddenException('No puedes editar tareas de otros usuarios');
         }

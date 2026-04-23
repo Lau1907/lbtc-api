@@ -58,6 +58,8 @@ export class UserController {
     }
 
     @Post()
+    @UseGuards(AuthGuard, RolesGuard)
+@Role('admin')
     public async insertUser(@Body() user: CreateUserDto): Promise<any> {
         const encryptedPassword = await this.utilSvc.hashPassword(user.password);
     user.password = encryptedPassword;
@@ -85,6 +87,9 @@ public async updateUser(
     throw new ForbiddenException('No puedes editar el perfil de otro usuario');
   }
 
+  if (user.password) {
+  user.password = await this.utilSvc.hashPassword(user.password);
+}
   const result = await this.userSvc.updateUser(id, user);
 
   //Log de cambio de rol

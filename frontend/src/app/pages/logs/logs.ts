@@ -22,6 +22,7 @@ export class LogsComponent implements OnInit {
   currentUser: any = null;
   isAdmin = false;
   filterUsername = '';
+  router: any;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
@@ -58,5 +59,10 @@ export class LogsComponent implements OnInit {
     this.filterTo = '';
     this.filterUsername= '';
     this.loadLogs();
+  }
+
+    logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 }

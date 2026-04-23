@@ -39,20 +39,31 @@ export class RegisterComponent {
   }
 
   register() {
-    this.auth.register({
-      name: this.name,
-      lastname: this.lastname,
-      username: this.username,
-      password: this.password,
-      role: this.role
-    }).subscribe({
-      next: (res) => {
-        this.auth.saveTokens(res.access_token, res.refresh_token);
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        this.error = 'Error al registrarse, intenta de nuevo';
-      }
-    });
+  // Validar contraseña antes de enviar
+  this.passwordErrors = this.validatePassword(this.password);
+  if (this.passwordErrors.length > 0) return; // 👈 detiene si hay errores
+
+  this.error = '';
+
+  if (!this.name || !this.lastname || !this.username || !this.password) {
+    this.error = 'Todos los campos son requeridos';
+    return;
   }
+
+  this.auth.register({
+    name: this.name,
+    lastname: this.lastname,
+    username: this.username,
+    password: this.password,
+    role: this.role
+  }).subscribe({
+    next: (res) => {
+      this.auth.saveTokens(res.access_token, res.refresh_token);
+      this.router.navigate(['/dashboard']);
+    },
+    error: () => {
+      this.error = 'Error al registrarse, intenta de nuevo';
+    }
+  });
+}
 }

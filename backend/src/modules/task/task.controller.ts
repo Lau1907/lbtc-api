@@ -26,11 +26,21 @@ export class TaskController{
 @Post()
 @UseGuards(AuthGuard)
 public async insertTask(@Body() task: any, @Req() req: any): Promise<any> {
-  const result = await this.taskSvc.insertTask(task);
-  
-  // 👇 Log de creación de tarea
-  await this.taskSvc.saveLog(201, '/api/task', `Tarea creada: ${task.name} por usuario ${req['user'].sub}`, 'TASK_CREATED');
-  
+
+  const userId = req['user'].sub;
+
+  const result = await this.taskSvc.insertTask({
+    ...task,
+    user_id: userId 
+  });
+
+  await this.taskSvc.saveLog(
+    201,
+    '/api/task',
+    `Tarea creada: ${task.name} por usuario ${userId}`,
+    'TASK_CREATED'
+  );
+
   return result;
 }
 
@@ -39,7 +49,14 @@ public async insertTask(@Body() task: any, @Req() req: any): Promise<any> {
 @HttpCode(HttpStatus.OK)
 public async deleteTask(@Param("id", ParseIntPipe) id: number, @Req() req: any): Promise<boolean> {
   const userId = req['user'].sub;
-  const task = await this.taskSvc.getTaskById(id);
+  
+  // Buscar tarea y manejar si no existe
+  let task;
+  try {
+    task = await this.taskSvc.getTaskById(id);
+  } catch {
+    throw new HttpException('Tarea no encontrada', HttpStatus.NOT_FOUND);
+  }
 
   if (task.user_id !== userId) {
     throw new ForbiddenException('No puedes eliminar tareas de otros usuarios');
@@ -48,7 +65,6 @@ public async deleteTask(@Param("id", ParseIntPipe) id: number, @Req() req: any):
   const result = await this.taskSvc.deleteTask(id);
   if (!result) throw new HttpException('No se pudo eliminar la tarea', HttpStatus.INTERNAL_SERVER_ERROR);
 
-  // 👇 Log de eliminación de tarea
   await this.taskSvc.saveLog(200, '/api/task', `Tarea eliminada: ${id} por usuario ${userId}`, 'TASK_DELETED');
 
   return result;
@@ -62,7 +78,13 @@ public async updateTask(
   @Req() req: any
 ): Promise<any> {
   const userId = req['user'].sub;
-  const existingTask = await this.taskSvc.getTaskById(id);
+  
+  let existingTask;
+  try {
+    existingTask = await this.taskSvc.getTaskById(id);
+  } catch {
+    throw new HttpException('Tarea no encontrada', HttpStatus.NOT_FOUND);
+  }
 
   if (existingTask.user_id !== userId) {
     throw new ForbiddenException('No puedes editar tareas de otros usuarios');

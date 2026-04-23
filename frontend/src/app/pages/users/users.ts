@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -20,10 +20,13 @@ export class UsersComponent implements OnInit {
   isAdmin = false;
   errorMsg = '';
   successMsg = '';
+  password = '';
+  passwordErrors: string[] = [];
+  editPasswordErrors: string[] = [];
 
   newUser = { name: '', lastname: '', username: '', password: '', role: 'user' };
 
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(private http: HttpClient, private auth: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.currentUser = this.auth.getCurrentUser();
@@ -38,13 +41,21 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  createUser() {
-    this.errorMsg = '';
-    if (!this.newUser.name || !this.newUser.username || !this.newUser.password) {
-      this.errorMsg = 'Todos los campos son requeridos';
-      return;
-    }
-    this.http.post('/api/user', this.newUser).subscribe({
+createUser() {
+  this.errorMsg = '';
+
+  if (!this.newUser.name || !this.newUser.username || !this.newUser.password) {
+    this.errorMsg = 'Todos los campos son requeridos';
+    return;
+  }
+
+  this.passwordErrors = this.validatePassword(this.newUser.password);
+  if (this.passwordErrors.length > 0) {
+    this.errorMsg = 'La contraseña no cumple los requisitos';
+    return;
+  }
+
+  this.http.post('/api/user', this.newUser).subscribe({
       next: () => {
         this.successMsg = 'Usuario creado exitosamente';
         this.newUser = { name: '', lastname: '', username: '', password: '' , role: 'user'};
@@ -60,16 +71,27 @@ export class UsersComponent implements OnInit {
     this.editingUser = { ...user, password: '' };
   }
 
-  saveEdit() {
-    this.http.put(`/api/user/${this.editingUser.id}`, this.editingUser).subscribe({
-      next: () => {
-        this.successMsg = 'Usuario actualizado';
-        this.editingUser = null;
-        this.loadUsers();
-        setTimeout(() => this.successMsg = '', 3000);
-      },
-      error: () => this.errorMsg = 'Error al actualizar el usuario'
-    });
+saveEdit() {
+  this.errorMsg = '';
+
+  if (this.editingUser.password) {
+    this.editPasswordErrors = this.validatePassword(this.editingUser.password);
+
+    if (this.editPasswordErrors.length > 0) {
+      this.errorMsg = 'La contraseña no cumple los requisitos';
+      return;
+    }
+  }
+
+this.http.put(`/api/user/${this.editingUser.id}`, this.editingUser).subscribe({
+  next: () => {
+    this.successMsg = 'Usuario actualizado';
+    this.editingUser = null;
+    this.loadUsers();
+    setTimeout(() => this.successMsg = '', 3000);
+  },
+  error: () => this.errorMsg = 'Error al actualizar el usuario'
+});
   }
 
   cancelEdit() { this.editingUser = null; }
@@ -84,5 +106,25 @@ export class UsersComponent implements OnInit {
       },
       error: () => this.errorMsg = 'Error al eliminar el usuario'
     });
+  }
+
+  validatePassword(password: string): string[] {
+  const errors = [];
+  if (password.length < 8) errors.push('Mínimo 8 caracteres');
+  if (!/[A-Z]/.test(password)) errors.push('Al menos una mayúscula');
+  if (!/[0-9]/.test(password)) errors.push('Al menos un número');
+  if (!/[!@#$%^&*]/.test(password)) errors.push('Al menos un carácter especial (!@#$%^&*)');
+  return errors;
+}
+onEditPasswordChange() {
+  this.editPasswordErrors = this.validatePassword(this.editingUser.password || '');
+}
+
+onPasswordChange() {
+  this.passwordErrors = this.validatePassword(this.newUser.password);
+}
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 }

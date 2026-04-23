@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
 
@@ -23,7 +23,7 @@ export class TasksComponent implements OnInit {
   errorMsg = '';
   successMsg = '';
 
-  constructor(private taskService: TaskService, private auth: AuthService) {}
+  constructor(private taskService: TaskService, private auth: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.currentUser = this.auth.getCurrentUser();
@@ -31,11 +31,12 @@ export class TasksComponent implements OnInit {
     this.loadTasks();
   }
 
-  loadTasks() {
-    this.taskService.getTasks().subscribe((data: any) => {
-      this.tasks = data;
-    });
-  }
+loadTasks() {
+  this.taskService.getTasks().subscribe((data: any) => {
+    console.log('DATA:', data);
+    this.tasks = data;
+  });
+}
 
   addTask() {
   this.errorMsg = '';
@@ -55,12 +56,11 @@ export class TasksComponent implements OnInit {
   this.title = this.title.replace(/<[^>]*>/g, '');
   this.description = this.description.replace(/<[^>]*>/g, '');
 
-  this.taskService.createTask({
-    name: this.title,
-    description: this.description,
-    priority: this.priority,
-    user_id: 1
-  }).subscribe({
+this.taskService.createTask({
+  name: this.title,
+  description: this.description,
+  priority: this.priority
+}).subscribe({
     next: () => {
       this.successMsg = 'Tarea creada exitosamente ';
       this.title = '';
@@ -72,12 +72,17 @@ export class TasksComponent implements OnInit {
     error: () => alert('Error al crear la tarea')
   });
 }
-  deleteTask(id: number) {
+deleteTask(id: number) {
   if (!confirm('¿Estás seguro de que quieres eliminar esta tarea?')) return;
+
   this.taskService.deleteTask(id).subscribe({
     next: () => {
-      this.successMsg = 'Tarea eliminada ';
+      this.successMsg = 'Tarea eliminada';
+
+      this.tasks = this.tasks.filter(task => task.id !== id);
+
       this.loadTasks();
+
       setTimeout(() => this.successMsg = '', 3000);
     },
     error: () => {
@@ -85,7 +90,6 @@ export class TasksComponent implements OnInit {
     }
   });
 }
-
   startEdit(task: any) {
     this.editingTask = { ...task };
   }
@@ -106,5 +110,10 @@ export class TasksComponent implements OnInit {
 
   cancelEdit() {
     this.editingTask = null;
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 }

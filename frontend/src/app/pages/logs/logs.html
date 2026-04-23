@@ -17,6 +17,9 @@
     <a *ngIf="isAdmin" [routerLink]="['/users']" class="nav-item">Usuarios</a>
     <a *ngIf="isAdmin" [routerLink]="['/logs']" class="nav-item active">Logs</a>
     </nav>
+    
+    <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+
   </div>
 
   <div class="main-content">
