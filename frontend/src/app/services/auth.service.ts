@@ -43,4 +43,17 @@ export class AuthService {
   isLogged() {
     return !!this.getToken();
   }
+
+  getCurrentUser(): any {
+  const token = this.getToken();
+  if (!token) return null;
+  
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  return payload;
+}
+
+isAdmin(): boolean {
+  const user = this.getCurrentUser();
+  return user?.role === 'admin';
+}
 }

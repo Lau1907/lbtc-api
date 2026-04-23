@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-logs',
@@ -18,10 +19,16 @@ export class LogsComponent implements OnInit {
   filterStatus = '';
   filterFrom = '';
   filterTo = '';
+  currentUser: any = null;
+  isAdmin = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
-  ngOnInit() { this.loadLogs(); }
+  ngOnInit() {
+    this.currentUser = this.auth.getCurrentUser();
+    this.isAdmin = this.auth.isAdmin();
+    this.loadLogs();
+  }
 
   loadLogs() {
     let params = new URLSearchParams();

@@ -4,11 +4,18 @@
       <span>⚡</span>
       <h2>LBTC</h2>
     </div>
+  <div class="user-info">
+    <div class="user-avatar">{{ currentUser?.name?.charAt(0) }}</div>
+    <div>
+      <p class="user-name">{{ currentUser?.name }}</p>
+      <p class="user-role">{{ isAdmin ? 'Admin' : 'Usuario' }}</p>
+    </div>
+  </div>
     <nav class="sidebar-nav">
-      <a [routerLink]="['/dashboard']" class="nav-item">📊 Dashboard</a>
-      <a [routerLink]="['/tasks']" class="nav-item">✅ Tareas</a>
-      <a [routerLink]="['/users']" class="nav-item">👥 Usuarios</a>
-      <a [routerLink]="['/logs']" class="nav-item active">📋 Logs</a>
+      <a [routerLink]="['/dashboard']" class="nav-item">Dashboard</a>
+      <a [routerLink]="['/tasks']" class="nav-item">Tareas</a>
+    <a *ngIf="isAdmin" [routerLink]="['/users']" class="nav-item">Usuarios</a>
+    <a *ngIf="isAdmin" [routerLink]="['/logs']" class="nav-item active">Logs</a>
     </nav>
   </div>
 

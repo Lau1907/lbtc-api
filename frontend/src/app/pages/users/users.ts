@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-users',
@@ -15,10 +16,18 @@ export class UsersComponent implements OnInit {
   users: any[] = [];
   editingUser: any = null;
   showForm = false;
+  currentUser: any = null;
+  isAdmin = false;
 
   newUser = { name: '', lastname: '', username: '', password: '' };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
+
+  ngOnInit() {
+    this.currentUser = this.auth.getCurrentUser();
+    this.isAdmin = this.auth.isAdmin();
+    this.loadUsers();
+  }
 
   private getHeaders() {
     return {
@@ -27,8 +36,6 @@ export class UsersComponent implements OnInit {
       })
     };
   }
-
-  ngOnInit() { this.loadUsers(); }
 
   loadUsers() {
     this.http.get<any[]>('/api/user', this.getHeaders()).subscribe(data => {

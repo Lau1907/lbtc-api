@@ -1,41 +1,53 @@
 <div class="dashboard">
-
   <div class="sidebar">
     <div class="sidebar-logo">
       <span>⚡</span>
       <h2>LBTC</h2>
     </div>
 
+    <div class="user-info">
+      <div class="user-avatar">{{ currentUser?.name?.charAt(0) }}</div>
+      <div>
+        <p class="user-name">{{ currentUser?.name }}</p>
+        <p class="user-role">{{ isAdmin ? 'Admin' : 'Usuario' }}</p>
+      </div>
+    </div>
+
     <nav class="sidebar-nav">
       <a [routerLink]="['/dashboard']" class="nav-item active">📊 Dashboard</a>
       <a [routerLink]="['/tasks']" class="nav-item">Tareas</a>
-      <a [routerLink]="['/users']" class="nav-item">👥 Usuarios</a>
-      <a [routerLink]="['/logs']" class="nav-item">Logs</a> 
+      <a *ngIf="isAdmin" [routerLink]="['/users']" class="nav-item">Usuarios</a>
+      <a *ngIf="isAdmin" [routerLink]="['/logs']" class="nav-item">Logs</a>
     </nav>
 
-    <button class="btn-logout" (click)="logout()">🚪 Cerrar sesión</button>
+    <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
   </div>
 
   <div class="main-content">
     <div class="header">
-      <h1>Bienvenido 👋</h1>
+      <h1>Bienvenido, {{ currentUser?.name }} </h1>
       <p>Gestiona tus tareas desde aquí</p>
     </div>
 
     <div class="cards">
       <div class="card">
-        <div class="card-icon">✅</div>
+        <div class="card-icon"></div>
         <h3>Tareas</h3>
         <p>Gestiona y organiza tus tareas</p>
         <a [routerLink]="['/tasks']" class="card-btn">Ir a tareas</a>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="isAdmin">
         <div class="card-icon">👥</div>
         <h3>Usuarios</h3>
         <p>Gestiona los usuarios del sistema</p>
         <a [routerLink]="['/users']" class="card-btn">Ir a usuarios</a>
       </div>
+      <div class="card" *ngIf="isAdmin">
+        <div class="card-icon"></div>
+        <h3>Auditoría</h3>
+        <p>Revisa los logs del sistema</p>
+        <a [routerLink]="['/logs']" class="card-btn">Ver logs</a>
+      </div>
     </div>
   </div>
-
 </div>

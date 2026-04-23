@@ -38,10 +38,14 @@ let TaskService = class TaskService {
         return task;
     }
     async insertTask(task) {
+        const name = task.name?.trim().substring(0, 100) ?? '';
+        const description = task.description?.trim().substring(0, 500) ?? '';
+        if (!name)
+            throw new Error('El nombre es requerido');
         return await this.prisma.task.create({
             data: {
-                name: task.name,
-                description: task.description,
+                name,
+                description,
                 priority: task.priority ?? false,
                 user_id: task.user_id
             }
