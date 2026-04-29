@@ -6,19 +6,23 @@ datasource db {
   provider = "postgresql"
 }
 
-
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  user User[]
+}
 model User {
   id         Int      @id @default(autoincrement())
   name       String
   lastname   String
   username   String   @unique
   password   String
-  hash       String?  
-  role       String @default("user")
+  hash       String?
+  role_id    Int      @default(1)  // 👈 1 = user, 2 = admin
+  role       Role     @relation(fields: [role_id], references: [id])
   created_at DateTime @default(now())
-    tasks Task[]
-
-    logs Logs[]
+  tasks      Task[]
+  logs       Logs[]
 }
 
 model Task {
@@ -41,3 +45,4 @@ model Logs{
   
   user User? @relation(fields: [session_id], references: [id])
 }
+

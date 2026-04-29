@@ -41,24 +41,36 @@ export class UsersComponent implements OnInit {
     });
   }
 
-createUser() {
-  this.errorMsg = '';
+  createUser() {
+    this.errorMsg = '';
 
-  if (!this.newUser.name || !this.newUser.username || !this.newUser.password) {
-    this.errorMsg = 'Todos los campos son requeridos';
-    return;
-  }
+    if (!this.newUser.name || this.newUser.name.trim().length < 2) {
+      this.errorMsg = 'El nombre debe tener al menos 2 caracteres';
+      return;
+    }
+    if (!this.newUser.lastname || this.newUser.lastname.trim().length < 2) {
+      this.errorMsg = 'El apellido debe tener al menos 2 caracteres';
+      return;
+    }
+    if (!this.newUser.username || this.newUser.username.trim().length < 4) {
+      this.errorMsg = 'El usuario debe tener al menos 4 caracteres';
+      return;
+    }
+    if (!this.newUser.password) {
+      this.errorMsg = 'La contraseña es requerida';
+      return;
+    }
 
-  this.passwordErrors = this.validatePassword(this.newUser.password);
-  if (this.passwordErrors.length > 0) {
-    this.errorMsg = 'La contraseña no cumple los requisitos';
-    return;
-  }
+    this.passwordErrors = this.validatePassword(this.newUser.password);
+    if (this.passwordErrors.length > 0) {
+      this.errorMsg = 'La contraseña no cumple los requisitos';
+      return;
+    }
 
-  this.http.post('/api/user', this.newUser).subscribe({
+    this.http.post('/api/user', this.newUser).subscribe({
       next: () => {
-        this.successMsg = 'Usuario creado exitosamente';
-        this.newUser = { name: '', lastname: '', username: '', password: '' , role: 'user'};
+        this.successMsg = 'Usuario creado exitosamente ';
+        this.newUser = { name: '', lastname: '', username: '', password: '', role: 'user' };
         this.showForm = false;
         this.loadUsers();
         setTimeout(() => this.successMsg = '', 3000);

@@ -39,12 +39,23 @@ export class RegisterComponent {
   }
 
   register() {
-  // Validar contraseña antes de enviar
   this.passwordErrors = this.validatePassword(this.password);
-  if (this.passwordErrors.length > 0) return; // 👈 detiene si hay errores
+  if (this.passwordErrors.length > 0) return; 
 
   this.error = '';
 
+  if (!this.name || this.name.trim().length < 2) {
+    this.error = 'El nombre debe tener al menos 2 caracteres';
+    return;
+  }
+  if (!this.lastname || this.lastname.trim().length < 2) {
+    this.error = 'El apellido debe tener al menos 2 caracteres';
+    return;
+  }
+  if (!this.username || this.username.trim().length < 4) {
+    this.error = 'El usuario debe tener al menos 4 caracteres';
+    return;
+  }
   if (!this.name || !this.lastname || !this.username || !this.password) {
     this.error = 'Todos los campos son requeridos';
     return;

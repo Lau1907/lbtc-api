@@ -1,18 +1,18 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    ForbiddenException,
-    Get,
-    HttpCode,
-    HttpException,
-    HttpStatus,
-    Param,
-    ParseIntPipe,
-    Post,
-    Put,
-    Req,
-    UseGuards
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Req,
+  UseGuards
 } from "@nestjs/common";
 
 import { Role } from 'src/common/decorators/roles.decorator';
@@ -61,7 +61,7 @@ export class UserController {
     @UseGuards(AuthGuard, RolesGuard)
 @Role('admin')
     public async insertUser(@Body() user: CreateUserDto): Promise<any> {
-        const encryptedPassword = await this.utilSvc.hashPassword(user.password);
+        const encryptedPassword = await this.utilSvc.hashPassword(user.password!);
     user.password = encryptedPassword;
     const result = await this.userSvc.insertUser(user);
     if (result == undefined || result == null) {
@@ -73,7 +73,7 @@ export class UserController {
     return result;
   }
 
-    @Put(":id")
+@Put(":id")
 @UseGuards(AuthGuard)
 public async updateUser(
   @Param("id", ParseIntPipe) id: number,
@@ -87,12 +87,9 @@ public async updateUser(
     throw new ForbiddenException('No puedes editar el perfil de otro usuario');
   }
 
-  if (user.password) {
-  user.password = await this.utilSvc.hashPassword(user.password);
-}
   const result = await this.userSvc.updateUser(id, user);
 
-  //Log de cambio de rol
+  // 👇 Log de cambio de rol
   if (user.role) {
     await this.userSvc.saveLog(
       200,

@@ -32,13 +32,20 @@
   <div class="alert-success" *ngIf="successMsg">{{ successMsg }}</div>
   <div class="alert-error" *ngIf="errorMsg">{{ errorMsg }}</div>
 
-    <!-- Formulario agregar -->
-    <div class="task-form">
-  <input class="form-input" [(ngModel)]="title" placeholder="Título de la tarea" />
-  <input class="form-input" [(ngModel)]="description" placeholder="Descripción (opcional)" />
+<!-- Formulario agregar -->
+<div class="task-form">
+  <div style="flex: 1; min-width: 200px;">
+    <input class="form-input" [(ngModel)]="title" placeholder="Título de la tarea" minlength="3" maxlength="100" style="width: 100%; box-sizing: border-box;"/>
+    <small class="field-error" *ngIf="title && title.length < 3">Mínimo 3 caracteres</small>
+    <small class="field-error" *ngIf="title && title.length >= 100">Máximo 100 caracteres</small>
+  </div>
+  <div style="flex: 1; min-width: 200px;">
+    <input class="form-input" [(ngModel)]="description" placeholder="Descripción (opcional)" maxlength="500" style="width: 100%; box-sizing: border-box;"/>
+    <small class="field-error" *ngIf="description && description.length >= 500">Máximo 500 caracteres</small>
+  </div>
   <select class="form-input" [(ngModel)]="priority">
     <option [ngValue]="false">Normal</option>
-    <option [ngValue]="true">Alta prioridad </option>
+    <option [ngValue]="true">Alta prioridad</option>
   </select>
   <button class="btn-add" (click)="addTask()">+ Agregar</button>
 </div>

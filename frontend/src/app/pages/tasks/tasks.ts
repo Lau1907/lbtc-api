@@ -38,29 +38,33 @@ loadTasks() {
   });
 }
 
-  addTask() {
+addTask() {
   this.errorMsg = '';
   this.title = this.title.trim();
   this.description = this.description.trim();
 
-  if (!this.title) return;
-  if (this.title.length > 100) {
-    alert('El título no puede tener más de 100 caracteres');
-    return;
-  }
-   if (!this.title) {
+  if (!this.title) {
     this.errorMsg = 'El título es requerido';
     return;
   }
+  if (this.title.length < 3) {
+    this.errorMsg = 'El título debe tener al menos 3 caracteres';
+    return;
+  }
+  if (this.title.length > 100) {
+    this.errorMsg = 'El título no puede tener más de 100 caracteres';
+    return;
+  }
 
+  // Sanitización XSS
   this.title = this.title.replace(/<[^>]*>/g, '');
   this.description = this.description.replace(/<[^>]*>/g, '');
 
-this.taskService.createTask({
-  name: this.title,
-  description: this.description,
-  priority: this.priority
-}).subscribe({
+  this.taskService.createTask({
+    name: this.title,
+    description: this.description,
+    priority: this.priority
+  }).subscribe({
     next: () => {
       this.successMsg = 'Tarea creada exitosamente ';
       this.title = '';
@@ -69,9 +73,12 @@ this.taskService.createTask({
       this.loadTasks();
       setTimeout(() => this.successMsg = '', 3000);
     },
-    error: () => alert('Error al crear la tarea')
+    error: () => {
+      this.errorMsg = 'Error al crear la tarea';
+    }
   });
 }
+
 deleteTask(id: number) {
   if (!confirm('¿Estás seguro de que quieres eliminar esta tarea?')) return;
 

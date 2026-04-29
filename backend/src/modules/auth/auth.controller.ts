@@ -23,15 +23,21 @@ export class AuthController {
     private readonly utilSvc: UtilService  ) {}
 
   // Genera tokens de acceso y refresh para el usuario autenticado
-  private async generateTokens(user: { id: number; name: string; lastname: string, role: string }) {
-    const basePayload = { sub: user.id, name: user.name, lastName: user.lastname, role: user.role };
-    const refresh_token_jwt = await this.utilSvc.generateJWT(basePayload, '7d');
-    const hashRT = await this.utilSvc.hash(refresh_token_jwt);
-    await this.authSvc.updateHash(user.id, hashRT);
+private async generateTokens(user: { id: number; name: string; lastname: string; role?: any; role_id?: number }) {
+  const roleName = user.role?.name ?? 'user';
+  const basePayload = { 
+    sub: user.id, 
+    name: user.name, 
+    lastName: user.lastname,
+    role: roleName
+  };
+  const refresh_token_jwt = await this.utilSvc.generateJWT(basePayload, '7d');
+  const hashRT = await this.utilSvc.hash(refresh_token_jwt);
+  await this.authSvc.updateHash(user.id, hashRT);
 
-    const access_token = await this.utilSvc.generateJWT({ ...basePayload, hash: hashRT }, '1h');
-    return { access_token, refresh_token: refresh_token_jwt };
-  }
+  const access_token = await this.utilSvc.generateJWT({ ...basePayload, hash: hashRT }, '1h');
+  return { access_token, refresh_token: refresh_token_jwt };
+}
 
   // Registra un nuevo usuario y devuelve tokens JWT
   @Post('/register')
@@ -39,8 +45,8 @@ export class AuthController {
 public async register(@Body() createUserDto: CreateUserDto) {
   try {
     const { name, lastname, username, password, role } = createUserDto;
-    const hashedPassword = await this.utilSvc.hashPassword(password);
-    const user = await this.authSvc.register(name, lastname, username, hashedPassword, role ?? 'user');
+    const hashedPassword = await this.utilSvc.hashPassword(password!);
+    const user = await this.authSvc.register(name!, lastname!, username!, hashedPassword, role ?? 'user');
     return this.generateTokens(user);
   } catch (error) {
     console.error('REGISTER ERROR:', error); 

@@ -98,19 +98,35 @@ export class AuthService {
     });
   }
 
-  public async getUserById(id: number): Promise<User | null> {
-    return await this.prisma.user.findFirst({ where: { id } });
-  }
+public async getUserByUsername(username: string): Promise<any> {
+  return await this.prisma.user.findFirst({ 
+    where: { username },
+    include: { role: true }
+  });
+}
 
-  public async getUserByUsername(username: string): Promise<User | null> {
-    return await this.prisma.user.findFirst({ where: { username } });
-  }
+public async getUserById(id: number): Promise<any> {
+  return await this.prisma.user.findFirst({ 
+    where: { id },
+    include: { role: true }
+  });
+}
 
-  async register(name: string, lastname: string, username: string, hashedPassword: string, role: string): Promise<User> {
-    return await this.prisma.user.create({
-      data: { name, lastname, username, password: hashedPassword, role },
-    });
-  }
+async register(name: string, lastname: string, username: string, hashedPassword: string, role: string = 'user'): Promise<User> {
+  // Buscar el id del rol
+  const roleRecord = await this.prisma.role.findFirst({ where: { name: role } });
+  const roleId = roleRecord?.id ?? 1;
+
+  return await this.prisma.user.create({
+    data: { 
+      name, 
+      lastname, 
+      username, 
+      password: hashedPassword, 
+      role_id: roleId
+    },
+  });
+}
 
   // Guarda un log de evento en la base de datos
 public async saveLog(statusCode: number, path: string, error: string, errorcode: string): Promise<void> {

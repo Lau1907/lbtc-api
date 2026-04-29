@@ -14,7 +14,7 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a [routerLink]="['/dashboard']" class="nav-item active">📊 Dashboard</a>
+      <a [routerLink]="['/dashboard']" class="nav-item active">Dashboard</a>
       <a [routerLink]="['/tasks']" class="nav-item">Tareas</a>
       <a *ngIf="isAdmin" [routerLink]="['/users']" class="nav-item">Usuarios</a>
       <a *ngIf="isAdmin" [routerLink]="['/logs']" class="nav-item">Logs</a>

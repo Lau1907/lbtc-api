@@ -3,8 +3,6 @@ import * as bcrypt from 'bcrypt';
 import { Client } from "pg";
 import { PrismaService } from "src/common/services/prisma.service";
 import { CreateUserDto } from "src/modules/auth/dto/create-user-dto";
-import { UpdateUserDto } from "src/modules/auth/dto/update-user-dto";
-import { User } from "src/modules/auth/entities/user.entity";
 
 @Injectable()
 export class UserService {
@@ -15,14 +13,15 @@ export class UserService {
     ) {}
 
 // Obtiene todos los usuarios sin exponer datos sensibles
-    public async getUsers(): Promise<any[]> {
+public async getUsers(): Promise<any[]> {
   return await this.prisma.user.findMany({
     select: {
       id: true,
       name: true,
       lastname: true,
       username: true,
-      role: true,
+      role_id: true,
+      role: { select: { name: true } }, 
       created_at: true
     }
   });
@@ -36,77 +35,89 @@ public async getUserById(id: number): Promise<any> {
       name: true,
       lastname: true,
       username: true,
-      role: true,
+      password: true,
+      role_id: true,
+      role: { select: { name: true } },
       created_at: true
     }
   });
-
   if (!user) throw new Error(`User with id ${id} not found`);
   return user;
 }
 
-// Busca un usuario por su nombre de usuario para autenticación
-    public async findByUsername(username: string): Promise<User | null> {
-        return await this.prisma.user.findFirst({
-            where: { username }
-        });
+public async findByUsername(username: string): Promise<any> {
+  return await this.prisma.user.findFirst({
+    where: { username },
+    include: { role: true }
+  });
+}
+
+    // Crear usuario
+public async insertUser(user: CreateUserDto): Promise<any> {
+  const hashedPassword = await bcrypt.hash(user.password!, 10);
+  
+  // Buscar el id del rol
+  const roleRecord = await this.prisma.role.findFirst({ 
+    where: { name: user.role ?? 'user' } 
+  });
+  const roleId = roleRecord?.id ?? 1;
+
+  return await this.prisma.user.create({
+    data: {
+      name: user.name!,
+      lastname: user.lastname!,
+      username: user.username!,
+      password: hashedPassword,
+      role_id: roleId
+    },
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      username: true,
+      role_id: true,
+      role: { select: { name: true } },
+      created_at: true
     }
+  });
+}
 
-    // ➕ Crear usuario
-    public async insertUser(user: CreateUserDto): Promise<User> {
+    public async updateUser(id: number, userUpdated: any): Promise<any> {
+  const user = await this.getUserById(id);
 
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+  // Si viene role como string, buscar el id
+  let roleId = user.role_id;
+  if (userUpdated.role) {
+    const roleRecord = await this.prisma.role.findFirst({ 
+      where: { name: userUpdated.role } 
+    });
+    roleId = roleRecord?.id ?? user.role_id;
+  }
 
-        const query = `
-        INSERT INTO "User" (name, lastname, username, password)
-        VALUES ($1, $2, $3, $4)
-        RETURNING *
-        `;
+  const hashedPassword = userUpdated.password
+    ? await bcrypt.hash(userUpdated.password, 10)
+    : user.password;
 
-        const result = await this.db.query(query, [
-            user.name,
-            user.lastname,
-            user.username,
-            hashedPassword
-        ]);
-
-        return result.rows[0];
+  return await this.prisma.user.update({
+    where: { id },
+    data: {
+      name: userUpdated.name ?? user.name,
+      lastname: userUpdated.lastname ?? user.lastname,
+      username: userUpdated.username ?? user.username,
+      password: hashedPassword,
+      role_id: roleId
+    },
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      username: true,
+      role_id: true,
+      role: { select: { name: true } },
+      created_at: true
     }
-
-    // ✏️ Actualizar usuario
-    public async updateUser(
-        id: number,
-        userUpdated: UpdateUserDto
-    ): Promise<User> {
-
-        const user = await this.getUserById(id);
-
-        const hashedPassword = userUpdated.password
-            ? await bcrypt.hash(userUpdated.password, 10)
-            : user.password;
-
-        const query = `
-        UPDATE "User"
-        SET
-            name=$1,
-            lastname=$2,
-            username=$3,
-            password=$4
-        WHERE id=$5
-        RETURNING *
-        `;
-
-        const result = await this.db.query(query, [
-            userUpdated.name ?? user.name,
-            userUpdated.lastname ?? user.lastname,
-            userUpdated.username ?? user.username,
-            hashedPassword,
-            id
-        ]);
-
-        return result.rows[0];
-    }
-
+  });
+}
     // 🗑️ Eliminar usuario
     public async deleteUser(id: number): Promise<boolean> {
 
