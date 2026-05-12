@@ -28,18 +28,32 @@ export class UsersComponent implements OnInit {
 
   constructor(private http: HttpClient, private auth: AuthService, private router: Router) {}
 
-  ngOnInit() {
-    this.currentUser = this.auth.getCurrentUser();
-    this.isAdmin = this.auth.isAdmin();
+ngOnInit() {
+  this.currentUser = this.auth.getCurrentUser();
+  this.isAdmin = this.auth.isAdmin();
+  
+  if (this.auth.getToken()) {
     this.loadUsers();
+  } else {
+    this.router.navigate(['/']);
   }
+}
 
-  loadUsers() {
-    this.http.get<any[]>('/api/user').subscribe({
-      next: (data) => this.users = data,
-      error: () => this.errorMsg = 'Error al cargar usuarios'
-    });
-  }
+loadUsers() {
+  this.http.get<any[]>('/api/user').subscribe({
+    next: (data) => {
+      this.users = data;
+      this.errorMsg = '';
+    },
+    error: (err) => {
+      if (err.status === 401) {
+        this.router.navigate(['/']);
+      } else {
+        this.errorMsg = 'Error al cargar usuarios';
+      }
+    }
+  });
+}
 
   createUser() {
     this.errorMsg = '';

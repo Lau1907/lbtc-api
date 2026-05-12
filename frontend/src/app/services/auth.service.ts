@@ -5,6 +5,13 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
+refresh(refreshToken: string) {
+  return this.http.post<{ access_token: string; refresh_token: string }>(
+    `${this.apiUrl}/refresh`,
+    {},
+    { headers: { Authorization: `Bearer ${refreshToken}` } }
+  );
+}
 
   private apiUrl = '/api/auth';
 
