@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Query, UseGuards } from '@nestjs/common'; // Añadimos Delete
 import { Role } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from 'src/common/guards/auth.guards';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -21,7 +21,7 @@ export class LogsController {
   ) {
     return await this.prisma.logs.findMany({
       where: {
-        ...(path && { path: { contains: path } }),
+        ...(path && { path: { contains: path, mode: 'insensitive' } }),
         ...(statusCode && { statusCode: parseInt(statusCode) }),
         ...(from && to && {
           timeStamp: {
@@ -29,10 +29,20 @@ export class LogsController {
             lte: new Date(to)
           }
         }),
-        ...(username && { error: { contains: username}})
+        // Ajuste: asumiendo que tienes un campo username en tu tabla logs
+        ...(username && { username: { contains: username, mode: 'insensitive' } })
       },
       orderBy: { timeStamp: 'desc' },
       take: 100
     });
+  }
+
+  // --- NUEVO MÉTODO PARA VACIAR LA TABLA ---
+  @Delete()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Role('admin')
+  public async clearLogs() {
+    await this.prisma.logs.deleteMany({});
+    return { message: 'Logs eliminados correctamente' };
   }
 }

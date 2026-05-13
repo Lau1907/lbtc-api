@@ -7,15 +7,19 @@ import pg from 'pg';
 dotenv.config();
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit{
-    constructor(){
-        const pool = new pg.Pool({connectionString: process.env.DATABASE_URL});
-        console.log("DATABASE_URL:", process.env.DATABASE_URL);
+export class PrismaService extends PrismaClient implements OnModuleInit {
+    constructor() {
+        const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
         const adapter = new PrismaPg(pool);
         super({ adapter });
     }
 
     async onModuleInit() {
-        await this.$connect();
+        try {
+            await this.$connect();
+            console.log('Conexión a la base de datos establecida con éxito.');
+        } catch (error) {
+            console.error('Error al conectar con la base de datos:', error);
+        }
     }
 }

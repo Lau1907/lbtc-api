@@ -30,7 +30,7 @@
 
 <div class="filters">
   <input class="form-input" [(ngModel)]="filterPath" placeholder="Filtrar por ruta (ej: /api/auth)" />
-  <input class="form-input" [(ngModel)]="filterUsername" placeholder="Filtrar por usuario" /> <!-- 👈 -->
+  <input class="form-input" [(ngModel)]="filterUsername" placeholder="Filtrar por usuario" /> 
   <select class="form-input" [(ngModel)]="filterStatus">
     <option value="">Todos los códigos</option>
     <option value="200">200 OK</option>
@@ -43,6 +43,9 @@
   <input class="form-input" type="date" [(ngModel)]="filterTo" />
   <button class="btn-search" (click)="loadLogs()">🔍 Buscar</button>
   <button class="btn-clear" (click)="clearFilters()">✕ Limpiar</button>
+  <button class="btn-delete" (click)="clearAllLogsFromDB()" *ngIf="isAdmin">
+  🗑️ Vaciar Auditoría
+</button>
 </div>
 
     <!-- Tabla logs -->

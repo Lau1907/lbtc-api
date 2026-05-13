@@ -9,8 +9,10 @@ import { PrismaService } from './common/services/prisma.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true
-  }));
+  whitelist: true,
+  forbidNonWhitelisted: true, 
+  transform: true,            
+}));
 
   const prisma = app.get(PrismaService);
   app.useGlobalFilters(new AllExceptionFilter(prisma));

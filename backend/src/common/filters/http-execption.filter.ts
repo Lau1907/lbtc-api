@@ -2,12 +2,13 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { Request, Response } from "express";
 import { PrismaService } from "../services/prisma.service";
 
+// common/filters/http-exception.filter.ts
+
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-
     constructor(private readonly prisma: PrismaService) {}
 
-    catch(exception: any, host: ArgumentsHost) {
+    async catch(exception: any, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest<Request>();
@@ -16,32 +17,37 @@ export class AllExceptionFilter implements ExceptionFilter {
             ? exception.getStatus()
             : HttpStatus.INTERNAL_SERVER_ERROR;
 
-        const message = exception instanceof HttpException
+        const rawResponse = exception instanceof HttpException
             ? exception.getResponse()
-            : 'Internal server error';
+            : { message: exception.message || 'Error inesperado', error: 'SERVER_ERROR' };
 
-const errorMessage = typeof message === 'string' 
-  ? message 
-  : Array.isArray((message as any).message)
-    ? (message as any).message.join(', ')
-    : (message as any).message;
-        // 👇 Guardar en BD
-        this.prisma.logs.create({
-            data: {
-                statusCode: status,
-                timeStamp: new Date(),
-                path: request.url,
-                error: errorMessage ?? 'Unknown error',
-                errorcode: (message as any).error ?? 'UNEXPECTED_ERROR',
+        // Extraemos el mensaje detallado para la columna "ERROR"
+        const errorMessage = typeof rawResponse === 'string' 
+            ? rawResponse 
+            : (rawResponse as any).message || 'No details provided';
+
+        // Solo guardamos en la base de datos si NO es un error de Auditoría (para evitar bucles)
+        if (!request.url.includes('/api/logs')) {
+            try {
+                await this.prisma.logs.create({
+                    data: {
+                        statusCode: status,
+                        timeStamp: new Date(),
+                        path: request.url,
+                        error: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
+                        errorcode: (rawResponse as any).error || 'ERROR_LOG',
+                    }
+                });
+            } catch (dbErr) {
+                console.error('Error al persistir log:', dbErr);
             }
-        }).catch(err => console.error('Error al guardar log:', err));
+        }
 
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
             error: errorMessage,
-            errorCode: (message as any).error || 'UNEXPECTED_ERROR',
         });
     }
 }

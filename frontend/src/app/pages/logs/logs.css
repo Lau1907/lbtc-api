@@ -223,3 +223,17 @@
 }
 
 
+.btn-delete {
+  background-color: #e74c3c; /* Un rojo que resalte para acción de borrado */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}

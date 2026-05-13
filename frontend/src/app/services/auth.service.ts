@@ -51,16 +51,26 @@ register(data: { name: string; lastname: string; username: string; password: str
     return !!this.getToken();
   }
 
-  getCurrentUser(): any {
+// auth.service.ts
+getCurrentUser(): any {
   const token = this.getToken();
   if (!token) return null;
   
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  return payload;
+  try {
+    // Usamos una forma más segura de decodificar el payload del JWT
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(window.atob(base64));
+    return payload;
+  } catch (e) {
+    console.error("Error decodificando token", e);
+    return null;
+  }
 }
 
 isAdmin(): boolean {
   const user = this.getCurrentUser();
-  return user?.role === 'admin';
+  // Verifica que el backend esté mandando 'admin' exactamente en el payload
+  return user && user.role === 'admin';
 }
 }
