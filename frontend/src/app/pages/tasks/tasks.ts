@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -11,7 +11,6 @@ import { TaskService } from '../../services/task.service';
   templateUrl: './tasks.html',
   styleUrl: './tasks.css'
 })
-
 export class TasksComponent implements OnInit {
   tasks: any[] = [];
   title = '';
@@ -23,15 +22,19 @@ export class TasksComponent implements OnInit {
   errorMsg = '';
   successMsg = '';
 
-  constructor(private taskService: TaskService, private auth: AuthService, private router: Router) {}
+  constructor(
+    private taskService: TaskService,
+    private auth: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    // Verificamos identidad primero
     this.currentUser = this.auth.getCurrentUser();
     this.isAdmin = this.auth.isAdmin();
 
     if (this.auth.getToken()) {
-      this.loadTasks(); // Llamada inmediata
+      this.loadTasks();
     } else {
       this.router.navigate(['/']);
     }
@@ -40,9 +43,8 @@ export class TasksComponent implements OnInit {
   loadTasks() {
     this.taskService.getTasks().subscribe({
       next: (data: any) => {
-        // Asegúrate de que 'data' sea el arreglo. 
-        // Si el backend devuelve algo como { data: [...] }, usa data.data
-        this.tasks = data; 
+        this.tasks = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         if (err.status === 401) {
@@ -56,14 +58,22 @@ export class TasksComponent implements OnInit {
 
   private showSuccess(msg: string) {
     this.successMsg = msg;
-    this.errorMsg = ''; // Limpiamos errores previos
-    setTimeout(() => this.successMsg = '', 3000);
+    this.errorMsg = '';
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      this.successMsg = '';
+      this.cdr.detectChanges();
+    }, 3000);
   }
 
   private showError(msg: string) {
     this.errorMsg = msg;
-    this.successMsg = ''; // Limpiamos mensajes de éxito previos
-    setTimeout(() => this.errorMsg = '', 3000);
+    this.successMsg = '';
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      this.errorMsg = '';
+      this.cdr.detectChanges();
+    }, 3000);
   }
 
   addTask() {
@@ -76,13 +86,9 @@ export class TasksComponent implements OnInit {
       priority: this.priority
     }).subscribe({
       next: (newTask: any) => {
-        // Opción A: Agregar al array (más rápido)
         this.tasks = [...this.tasks, newTask];
-        // Opción B: Recargar del servidor para asegurar orden
-        // this.loadTasks(); 
-        
         this.resetForm();
-        this.showSuccess('Tarea creada exitosamente ');
+        this.showSuccess('¡Tarea creada exitosamente!');
       },
       error: () => this.showError('Error al crear la tarea')
     });
@@ -93,9 +99,8 @@ export class TasksComponent implements OnInit {
 
     this.taskService.deleteTask(id).subscribe({
       next: () => {
-        // Filtramos localmente para que desaparezca de inmediato
         this.tasks = this.tasks.filter(task => task.id !== id);
-        this.showSuccess('Tarea eliminada ');
+        this.showSuccess('¡Tarea eliminada exitosamente!');
       },
       error: () => this.showError('Error al eliminar la tarea')
     });
@@ -107,7 +112,6 @@ export class TasksComponent implements OnInit {
     this.priority = false;
   }
 
-
   startEdit(task: any) {
     this.editingTask = { ...task };
   }
@@ -117,7 +121,7 @@ export class TasksComponent implements OnInit {
       next: (updatedTask: any) => {
         this.tasks = this.tasks.map(t => t.id === updatedTask.id ? updatedTask : t);
         this.editingTask = null;
-        this.showSuccess('Tarea actualizada');
+        this.showSuccess('¡Tarea actualizada exitosamente!');
       },
       error: () => this.showError('Error al actualizar la tarea')
     });

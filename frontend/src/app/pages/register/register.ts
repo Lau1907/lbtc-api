@@ -70,7 +70,7 @@ export class RegisterComponent {
   }).subscribe({
     next: (res) => {
       this.auth.saveTokens(res.access_token, res.refresh_token);
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/login']);
     },
     error: () => {
       this.error = 'Error al registrarse, intenta de nuevo';
