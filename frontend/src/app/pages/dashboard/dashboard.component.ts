@@ -13,6 +13,7 @@ export class DashboardComponent implements OnInit{
 
   currentUser: any = null;
   isAdmin = false;
+  sidebarOpen = false;
 
   constructor(
     private auth: AuthService,
